@@ -1,0 +1,110 @@
+\documentclass[12pt,a4paper]{extreport}
+\usepackage[top=1.18in, bottom=0.98in, left=1.18in, right=1.18in]{geometry}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[style=apa, backend=biber]{biblatex} 
+\usepackage{amsmath}
+\usepackage{ragged2e}
+\usepackage{mathptmx}
+\usepackage{siunitx}
+\usepackage{circuitikz}
+\usepackage{color,soul}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{blindtext}
+\usepackage{soul}
+\usepackage{xcolor}
+\usepackage{arydshln}
+\usepackage{tikz}
+\usepackage{tabularx} 
+\usepackage{titlesec}
+\usepackage{changepage}
+\usepackage{eso-pic}
+\usepackage{xurl}
+
+\newcommand{\mathhl}[2]{\colorbox{#1}{$\displaystyle#2$}}
+
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\newcolumntype{N}{@{}m{0pt}@{}}
+
+\newcommand{\TITLE}{TITLE} 
+\newcommand{\AUTHOR}{Hans Sebastian} 
+\newcommand{\STUDENTID}{2022390007} 
+\newcommand{\STUDYPROGRAM}{Computer Science} 
+\newcommand{\FACULTY}{Faculty of Engineering annd Technology} 
+
+\makeatletter
+\newcommand{\skiplines}{
+	\@ifstar
+	\skiplinesimpl@star
+	\skiplinesimpl@nostar
+}
+
+\newcommand{\skiplinesimpl@star}[1]{
+	\vspace*{#1\baselineskip}
+}
+
+\newcommand{\skiplinesimpl@nostar}[1]{
+	\vspace{#1\baselineskip}
+}
+
+\makeatother
+
+\newcommand{\addimage}{\AddToShipoutPictureBG{%
+		\put(\LenToUnit{0.5\paperwidth},\LenToUnit{0.5\paperheight}){%
+			\makebox(0.125\paperwidth,0){\includegraphics[trim={0in 0in 6.34in 0in}, clip, width=0.75\paperwidth]{../Images/UNIVERSITY LOGO BACKGROUND.png}}%
+		}%
+}}
+
+\titleformat{\chapter}[display]
+	{\normalfont\bfseries\centering\fontsize{14pt}{14pt}\selectfont} % Format for the whole title block: normal, huge, bold, centered
+	{CHAPTER \thechapter}
+	{1em}                                 % Vertical space between the label and the title
+	{\MakeUppercase}                       % Code applied to the title text itself (e.g., "LITERATURE REVIEW")
+
+\titleformat{\section}
+	{\normalfont\bfseries\fontsize{12pt}{15pt}\selectfont}
+	{\thesection}
+	{1em}
+	{}
+
+\titleformat{\subsection}
+	{\normalfont\bfseries\fontsize{12pt}{15pt}\selectfont}
+	{\thesubsection}
+	{1em}
+	{}
+
+\titleformat{\subsubsection}
+	{\normalfont\bfseries\fontsize{12pt}{15pt}\selectfont}
+	{\thesubsubsection}
+	{1em}
+	{}
+
+\titlespacing*{\subsection}
+	{2em} % 1. Left margin indentation
+	{3.25ex plus 1ex minus .2ex} % 2. Vertical space before the title
+	{1.5ex plus .2ex} % 3. Vertical space after the title
+
+\titlespacing*{\subsubsection}
+	{4em} % 1. Left margin indentation
+	{3.25ex plus 1ex minus .2ex} % 2. Vertical space before the title
+	{1.5ex plus .2ex} % 3. Vertical space after the title
+
+\addbibresource{../References/references.bib}
+
+\AtBeginEnvironment{bibliography}{\fontsize{12pt}{\baselineskip}\selectfont}
+
+\begin{document}
+	\input{Thesis Title Page.tex}
+	\input{Thesis Supervisor Signature Page.tex}
+	\addimage
+%	\input{Thesis Introduction.tex}
+	\input{Thesis Literature Review Page.tex}
+%	\input{Thesis Proposed Methodology.tex}
+	\printbibliography
+\end{document}
