@@ -19,6 +19,53 @@
 
 \refsection{0}
   \datalist[entry]{apa/apasortcite//global/global/global}
+    \entry{cad_aranburu}{article}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=31898bb32777b6cb0d00c542a297d21d}{%
+           family={Aranburu},
+           familyi={A\bibinitperiod},
+           given={Aritz},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e2cd0f36769e537a566add4b5ed81dab}{%
+           family={Justel},
+           familyi={J\bibinitperiod},
+           given={Dani},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c55afa1271cae3dd0e3f56d8d46c9b67}{%
+           family={Angulo},
+           familyi={A\bibinitperiod},
+           given={Ivan},
+           giveni={I\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{517e7b25d7583842851787bb64ad5d67}
+      \strng{fullhash}{0b01e07941f7c4cd90cab564097f134f}
+      \strng{fullhashraw}{0b01e07941f7c4cd90cab564097f134f}
+      \strng{bibnamehash}{0b01e07941f7c4cd90cab564097f134f}
+      \strng{authorbibnamehash}{0b01e07941f7c4cd90cab564097f134f}
+      \strng{authornamehash}{517e7b25d7583842851787bb64ad5d67}
+      \strng{authorfullhash}{0b01e07941f7c4cd90cab564097f134f}
+      \strng{authorfullhashraw}{0b01e07941f7c4cd90cab564097f134f}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Computer-Aided Design and Applications}
+      \field{month}{04}
+      \field{title}{Reusability and Flexibility in Parametric Surface-based Models: A Review of Modelling Strategies}
+      \field{volume}{18}
+      \field{year}{2021}
+      \field{pages}{864\bibrangedash 874}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.14733/cadaps.2021.864-874
+      \endverb
+    \endentry
     \entry{word_embedding_models_deepak}{article}{}{}
       \name{author}{3}{}{%
         {{un=0,uniquepart=base,hash=eb7e8e40acca78f726668ee84492da30}{%
@@ -1691,6 +1738,65 @@
       \endverb
       \verb{url}
       \verb https://arxiv.org/abs/1612.00593
+      \endverb
+    \endentry
+    \entry{cad_rahman_etal}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=de2cd19c85c8cb1362f8fdfe3445aad7}{%
+           family={Rahman},
+           familyi={R\bibinitperiod},
+           given={Mohd},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9da30f6f7785b8800314d0de285d04c5}{%
+           family={Khatib},
+           familyi={K\bibinitperiod},
+           given={Mohammed},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e0ac2af2aad73fa685ad7e05cb2ce0c3}{%
+           family={Rani},
+           familyi={R\bibinitperiod},
+           given={P.},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=155cfd81b3d37cab4a6bff6da3001121}{%
+           family={Shaikh},
+           familyi={S\bibinitperiod},
+           given={Shahin},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d63b86527951a93510df4f8a37321c55}{%
+           family={Gunashekar},
+           familyi={G\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{74e146041111bf4f096c82b72c26a45d}
+      \strng{fullhash}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \strng{fullhashraw}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \strng{bibnamehash}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \strng{authorbibnamehash}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \strng{authornamehash}{74e146041111bf4f096c82b72c26a45d}
+      \strng{authorfullhash}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \strng{authorfullhashraw}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{International Journal of Innovative Technology and Exploring Engineering}
+      \field{month}{09}
+      \field{title}{Effect of Computer Aided Drafting on Manual Drafting Skills}
+      \field{volume}{8}
+      \field{year}{2019}
+      \field{pages}{3012\bibrangedash 3014}
+      \range{pages}{3}
+      \verb{doi}
+      \verb 10.35940/ijitee.K2315.0981119
       \endverb
     \endentry
     \entry{cad_classification_roj}{article}{}{}
@@ -2447,6 +2553,53 @@
     \endentry
   \enddatalist
   \datalist[entry]{apa/global//global/global/global}
+    \entry{cad_aranburu}{article}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=31898bb32777b6cb0d00c542a297d21d}{%
+           family={Aranburu},
+           familyi={A\bibinitperiod},
+           given={Aritz},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e2cd0f36769e537a566add4b5ed81dab}{%
+           family={Justel},
+           familyi={J\bibinitperiod},
+           given={Dani},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c55afa1271cae3dd0e3f56d8d46c9b67}{%
+           family={Angulo},
+           familyi={A\bibinitperiod},
+           given={Ivan},
+           giveni={I\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{517e7b25d7583842851787bb64ad5d67}
+      \strng{fullhash}{0b01e07941f7c4cd90cab564097f134f}
+      \strng{fullhashraw}{0b01e07941f7c4cd90cab564097f134f}
+      \strng{bibnamehash}{0b01e07941f7c4cd90cab564097f134f}
+      \strng{authorbibnamehash}{0b01e07941f7c4cd90cab564097f134f}
+      \strng{authornamehash}{517e7b25d7583842851787bb64ad5d67}
+      \strng{authorfullhash}{0b01e07941f7c4cd90cab564097f134f}
+      \strng{authorfullhashraw}{0b01e07941f7c4cd90cab564097f134f}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Computer-Aided Design and Applications}
+      \field{month}{04}
+      \field{title}{Reusability and Flexibility in Parametric Surface-based Models: A Review of Modelling Strategies}
+      \field{volume}{18}
+      \field{year}{2021}
+      \field{pages}{864\bibrangedash 874}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.14733/cadaps.2021.864-874
+      \endverb
+    \endentry
     \entry{word_embedding_models_deepak}{article}{}{}
       \name{author}{3}{}{%
         {{un=0,uniquepart=base,hash=eb7e8e40acca78f726668ee84492da30}{%
@@ -4121,6 +4274,65 @@
       \verb https://arxiv.org/abs/1612.00593
       \endverb
     \endentry
+    \entry{cad_rahman_etal}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=de2cd19c85c8cb1362f8fdfe3445aad7}{%
+           family={Rahman},
+           familyi={R\bibinitperiod},
+           given={Mohd},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9da30f6f7785b8800314d0de285d04c5}{%
+           family={Khatib},
+           familyi={K\bibinitperiod},
+           given={Mohammed},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e0ac2af2aad73fa685ad7e05cb2ce0c3}{%
+           family={Rani},
+           familyi={R\bibinitperiod},
+           given={P.},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=155cfd81b3d37cab4a6bff6da3001121}{%
+           family={Shaikh},
+           familyi={S\bibinitperiod},
+           given={Shahin},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d63b86527951a93510df4f8a37321c55}{%
+           family={Gunashekar},
+           familyi={G\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{74e146041111bf4f096c82b72c26a45d}
+      \strng{fullhash}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \strng{fullhashraw}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \strng{bibnamehash}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \strng{authorbibnamehash}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \strng{authornamehash}{74e146041111bf4f096c82b72c26a45d}
+      \strng{authorfullhash}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \strng{authorfullhashraw}{a9e93bac5a887d87e59f806dc4eb90f1}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{International Journal of Innovative Technology and Exploring Engineering}
+      \field{month}{09}
+      \field{title}{Effect of Computer Aided Drafting on Manual Drafting Skills}
+      \field{volume}{8}
+      \field{year}{2019}
+      \field{pages}{3012\bibrangedash 3014}
+      \range{pages}{3}
+      \verb{doi}
+      \verb 10.35940/ijitee.K2315.0981119
+      \endverb
+    \endentry
     \entry{cad_classification_roj}{article}{}{}
       \name{author}{5}{}{%
         {{un=0,uniquepart=base,hash=12cbec093b6ff10c1f9b0b5386012616}{%
@@ -4874,6 +5086,7 @@
       \endverb
     \endentry
   \enddatalist
+  \missing{general_purpose_cad_simon}
 \endrefsection
 \endinput
 
