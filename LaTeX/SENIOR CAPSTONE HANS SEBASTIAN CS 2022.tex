@@ -7,6 +7,7 @@
 \usepackage{amsmath}
 \usepackage{ragged2e}
 \usepackage{mathptmx}
+\usepackage[pdfborder={0 0 0}]{hyperref}
 \usepackage{siunitx}
 \usepackage{circuitikz}
 \usepackage{color,soul}
@@ -20,17 +21,23 @@
 \usepackage{soul}
 \usepackage{xcolor}
 \usepackage{arydshln}
+\usepackage{tabularray}
 \usepackage{tikz}
 \usepackage{tabularx} 
 \usepackage{titlesec}
 \usepackage{changepage}
 \usepackage{eso-pic}
 \usepackage{xurl}
+\usepackage{wrapfig}
 
 \newcommand{\mathhl}[2]{\colorbox{#1}{$\displaystyle#2$}}
 
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
 \newcolumntype{N}{@{}m{0pt}@{}}
+
+\setcounter{secnumdepth}{4}
+
+\renewcommand{\sectionautorefname}{Section}
 
 \newcommand{\TITLE}{TITLE} 
 \newcommand{\AUTHOR}{Hans Sebastian} 

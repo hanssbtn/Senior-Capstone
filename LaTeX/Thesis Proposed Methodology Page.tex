@@ -7,25 +7,47 @@
 % --- SECTION 3.1 ---
 \section{Data Gathering}
 
-% --- SUBSECTION 3.1.1 ---
-\subsection{Dataset Source Selection}
-\begin{adjustwidth}{4em}{0pt}
-	% --- write your text here ---
-	Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-	
-	% --- paragraph spacing ---
-	\skiplines{1}
-	
-	Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
-\end{adjustwidth}
+	% --- SUBSECTION 3.1.1 ---
+	\subsection{Dataset Source Selection}
+		\begin{adjustwidth}{4em}{0pt}
+			Publicly available datasets for CAD file designs can be found on the internet. One prominent example is the ABC dataset containing ..., Fusion 360 gallery containing ..., and Text2CAD which contains around 170.000 CAD models with 660.000 annotations ranging from short descriptions to detailed explanations \parencite{text2cad_mohammad}. Other sources include free 3D/CAD design websites such as GrabCAD and TraceParts, which contain various CAD objects not found in compiled datasets. A summary of the comparison for the sources listed above is contained in \autoref{tab:dataset_comparison_table} below.
+			
+			\begin{table}[!ht]
+				\centering
+				\begin{tblr}{
+					cells={valign=m,halign=c},
+					colspec={QQQ[4cm]Q[2.5cm]Q[2.5cm]},
+					hlines,
+					vlines
+				}
+					Source & Type & Summary & Advantages & Disadvantages \\
+					TraceParts & {Online \\ Website} & {A website \\containing free CAD \\designs for standard\\parts required for \\engineering purposes \\complete with names.} & {Completely free, \\contains standardized names with detailed specifications and assured quality} & {Contains only engineering designs, requires complex web scraping techniques}\\
+					GrabCAD & {Online \\ Website} & {A website containing 6+ million free CAD designs from online users for various applications} & Completely free, better diversity in terms of CAD designs & {CAD designs are sourced from anonymous users with unverified quality, require complex web scraping techniques} \\ 
+					Text2CAD & {Compiled \\ Dataset} & {A collection of CAD files of different engineering parts with standardized annotation} & &\\
+					Fusion 360 & {Compiled \\ Dataset} & & &\\
+					ABC & {Compiled \\ Dataset} & & &\\
+					
+				\end{tblr}
+				\caption{Comparison between various dataset sources.}
+				\label{tab:dataset_comparison_table}
+			\end{table} 
+			
+			Based on the analysis detailed in \autoref{tab:dataset_comparison_table}, this paper will utilize a combination of CAD designs contained in Text2CAD as well as other online sources such as ABC dataset and TraceParts to help improve dataset diversity and reduce the potential risks for low-quality designs that could negatively affect the model's output. To help minimize discrepancies between annotations of several different datasets, a standard for annotation format mimicking the existing annotations in the Text2CAD dataset will be used. 
+			
+		\end{adjustwidth}
+	\subsection{Dataset Preprocessing}
+		\subsubsection{Filtering}
+			\begin{adjustwidth}{4em}{0pt}
+				 The dataset gathered from the selected sources are filtered to remove rare, uncommon and/or low quality CAD designs that could negatively affect the model's output. The dataset is first analyzed using Python with Pandas module and manual inspection to figure out types of CAD designs with low occurrences (less than 100 unique designs). The number is chosen according to the existing dataset size as well as model parameters which will be discussed in \autoref{sec:model_design}. 
+			\end{adjustwidth}
+		\subsubsection{Annotation Format}
+			\begin{adjustwidth}{4em}{0pt}
+				
+			\end{adjustwidth}
 % --- SUBSECTION 3.1.2 ---
-\subsection{Preprocessing}
-\begin{adjustwidth}{4em}{0pt}
-	% --- write your text here ---
-\end{adjustwidth}
 % --- SECTION 3.2 ---
 \section{Model Design}
-
+\label{sec:model_design}
 % --- SUBSECTION 3.2.1 ---
 \subsection{Tokenizer}
 \begin{adjustwidth}{4em}{0pt}
