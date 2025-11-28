@@ -25,6 +25,7 @@
 \usepackage{tikz}
 \usepackage{tabularx} 
 \usepackage{titlesec}
+\usepackage{indentfirst}
 \usepackage{changepage}
 \usepackage{eso-pic}
 \usepackage{xurl}
@@ -37,13 +38,13 @@
 
 \setcounter{secnumdepth}{4}
 
-\renewcommand{\sectionautorefname}{Section}
-
 \newcommand{\TITLE}{TITLE} 
 \newcommand{\AUTHOR}{Hans Sebastian} 
 \newcommand{\STUDENTID}{2022390007} 
 \newcommand{\STUDYPROGRAM}{Computer Science} 
 \newcommand{\FACULTY}{Faculty of Engineering annd Technology} 
+
+\renewcommand{\sectionautorefname}{Section}
 
 \makeatletter
 \newcommand{\skiplines}{
@@ -92,15 +93,22 @@
 	{1em}
 	{}
 
-\titlespacing*{\subsection}
+\titlespacing{\subsection}
 	{2em} % 1. Left margin indentation
 	{3.25ex plus 1ex minus .2ex} % 2. Vertical space before the title
 	{1.5ex plus .2ex} % 3. Vertical space after the title
 
-\titlespacing*{\subsubsection}
+\titlespacing{\subsubsection}
 	{4em} % 1. Left margin indentation
 	{3.25ex plus 1ex minus .2ex} % 2. Vertical space before the title
 	{1.5ex plus .2ex} % 3. Vertical space after the title
+
+\captionsetup{width=0.7\linewidth}
+
+% A custom environment for indented first paragraph text
+\newenvironment{indentedblock}[2]
+	{\begin{adjustwidth}{#1}{#2}\par\hspace*{1em}} % Start
+	{\end{adjustwidth}} % End
 
 \addbibresource{../References/references.bib}
 
@@ -113,6 +121,7 @@
 	\input{Thesis Introduction Page.tex}
 	\input{Thesis Literature Review Page.tex}
 	\input{Thesis Proposed Methodology Page.tex}
+
 %	\input{Thesis Results and Discussion Page.tex}
 %   \input{Thesis Conclusion Page.tex}
 	\printbibliography

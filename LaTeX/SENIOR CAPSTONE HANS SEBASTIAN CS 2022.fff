@@ -1,0 +1,24 @@
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+[!ht]
+\centering
+\includegraphics[width=2.38in, height=0.98in]{../Images/UNIVERSITY LOGO SMALL}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+[!ht]
+\centering
+\includegraphics[width=2.38in, height=0.98in]{../Images/UNIVERSITY LOGO SMALL}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics[width=0.7\linewidth]{"../Images/CAD PROCESS FLOWCHART"}
+\caption{\centering Fig. 3: Flowchart of the CAD modeling process. Reprinted from \textcite{cad_process_fleche}}
+\label{fig:cad-process-flowchart}
+\end{figure*}

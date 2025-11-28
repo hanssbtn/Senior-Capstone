@@ -1,0 +1,35 @@
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+[!ht]
+\centering
+\begin{tabular}{cc}
+\textbf{Supervisor 1:} & \textbf{Supervisor 2:} \\
+&\\[1\baselineskip]
+% \includegraphics{../Images/signature.jpeg}&\includegraphics{../Images/signature.jpeg} \\
+&\\[1\baselineskip]
+\textbf{Supervisor 1 Name with title} & \textbf{Supervisor 2 Name with title}\\
+\end{tabular}
+\end{table*}
+\efloatseparator
+ 
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+[!ht]
+\centering
+\begin{tblr}{
+cells={valign=m,halign=c},
+colspec={QQQ[4cm]Q[2.5cm]Q[2.5cm]},
+hlines,
+vlines
+}
+Source & Type & Summary & Advantages & Disadvantages \\
+TraceParts & {Online \\ Website} & {A website \\containing free CAD \\designs for standard\\parts required for \\engineering purposes \\complete with names.} & {Completely free, \\contains standardized names with detailed specifications and assured quality} & {Contains only engineering designs, requires complex web scraping techniques}\\
+GrabCAD & {Online \\ Website} & {A website containing 6+ million free CAD designs from online users for various applications} & Completely free, better diversity in terms of CAD designs & {CAD designs are sourced from anonymous users with unverified quality, require complex web scraping techniques} \\
+Text2CAD & {Compiled \\ Dataset} & {A collection of CAD files of different engineering parts with standardized annotation} & &\\
+Fusion 360 & {Compiled \\ Dataset} & & &\\
+ABC & {Compiled \\ Dataset} & & &\\
+
+\end{tblr}
+\caption{Comparison between various dataset sources.}
+\label{tab:dataset_comparison_table}
+\end{table*}

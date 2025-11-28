@@ -1,4 +1,3 @@
-\setcounter{chapter}{1}
 \renewcommand{\thechapter}{\Roman{chapter}}
 \chapter{INTRODUCTION}
 \renewcommand{\thechapter}{\arabic{chapter}}
@@ -7,28 +6,50 @@
 \fontsize{12pt}{\baselineskip}\selectfont
 
 \section{Background}
-	\begin{adjustwidth}{4em}{0pt}
-		Since the beginning of the information age, the use of computer aided design (CAD) tools and software have largely replaced the use of mylars and blueprints which require manual drawings and measurements, which can be prone to human errors and are costly and hard to reproduce. This is especially true in engineering-related fields with one study showing up to 50\% reduction in task duration \parencites{cad_rahman_etal}{general_purpose_cad_simon}. Other benefits include the ability for immediate changes even during late-stage development which helps limit delays \parencite{cad_aranburu}. The main benefit of CAD tools is ability to reutilize/repurpose existing CAD designs to be reused in other CAD projects, resulting in more efficient, reliable workflows that eliminates the need to redesign already existing components from scratch \parencites{general_purpose_cad_simon}{gnn_mandelli}.
+	\subsection{Blueprinting and Other Traditional Copying Methods}
+		\begin{indentedblock}{4em}{0pt}
+			Before digital technology became widespread, engineers, architects and designers used conventional methods such as mylars and blueprints which require the drawings and measurements to be copied manually by dozens of workers. Blueprints utilized chemicals such as potassium ferricyaniide and ferric ammonium citrate solution to coat the original drawing to be copied. The coated paper is then exposed to ultraviolet light, creating a white-on-blue copy after washing it with water \parencite{blueprint_herschel}. 
+			This method suffers from 2 main drawbacks which limits productivity and flexibility when designing. One such drawback is the modification issue, which is that the master design to be fixed before copying, meaning any changes to the original causes the copies to be deprecated and the entire process redone from scratch. The other issue comes with the need to dry the copies before they become usable, creating more overhead. 
+			
+			\skiplines{1}
+			
+			Whiteprinting attempted to replace the original blueprinting technique by utilizing ammonia fumes instead of water, resulting in a black-on-white copy that does not need to be dried \parencite{whiteprint_parmeggiani}. Although it improved efficiency by creating a dry copy, whiteprinting includes the creation of hazardous fumes such as ammonia which could cause long-term damage to the operator \parencite{whiteprint_hazards_mcglothlin}. Furthermore, this technique still suffer from the modification issue that plagued the original. These downsides pushed engineers to develop better, more efficient alternatives.
+		\end{indentedblock}	
+	\subsection{Computer Aided Design}
+		\begin{indentedblock}{4em}{0pt}
+			Advances in technology have allowed for the development of better procedures, especially computer aided design (CAD) which largely alleviated the issues present in prior methods. CAD can be defined as the use of digital computers to create, modify, analyze, and optimize existing designs \parencite{cad_definition_sadrehaghighi}. In other words, CAD is the process of utilizing digital technology to perform the entire design process, from ideation to generation and sharing, bypassing the need for traditional copying procedures such as blueprinting. The concept originated from the first program \textit{Sketchpad} designed by Ivan Sutherland in 1963 \parencite{sketchpad_sutherland}, and has received numerous improvements with newer tools and programs such as SolidWorks \parencite{solidworks_zeid}. A short diagram detailing the CAD process can be seen in \autoref{fig:cad_process_flowchart}. 
+			
+			\begin{figure}[!ht]
+				\centering
+				\includegraphics[width=0.75\linewidth]{"../Images/CAD PROCESS FLOWCHART"}
+				\caption{\centering Flowchart of the CAD modeling process \parencite{cad_process_fleche}.}
+				\vspace{0.2cm} % Add a small gap
+%				\begin{minipage}{0.70\linewidth} % Keeps text width aligned with image
+%					\footnotesize % Notes are usually a bit smaller
+%					
+%				\end{minipage}
+				\label{fig:cad_process_flowchart}
+			\end{figure}
+			
+			In the current era, the use of CAD tools and software have largely replaced such methods as they lack the limitations that come with traditional techniques. This is especially true in engineering-related fields with one study showing up to 50\% reduction in task duration \parencites{cad_rahman_etal}{general_purpose_cad_simon}. Other benefits include the ability for immediate changes even during late-stage development which helps limit delays \parencite{cad_aranburu}. The main benefit of CAD tools is ability to reutilize/repurpose existing CAD designs to be reused in other CAD projects, resulting in more efficient, reliable workflows that eliminates the need to redesign already existing components from scratch \parencite{general_purpose_cad_simon}.
+			
+			\skiplines{1}
 		
-		\skiplines{1}
-	
-		Although the use of CAD have improved the overall design and manufacturing process, they also pose their own set of issues. For example, CAD software developers often employ their own proprietary file formats, each with their own complex structures. This results in major incompatibility issues as users might have different tooling preferences. Other issues include difficulties in documentation and indexing for existing CAD designs, as the complexity of the file's structure inhibit the use of automated annotation and indexing tools, forcing the use of manual annotation. As a result, numerous universal CAD file formats such as STEP and STL have been developed to handle the issue of compatibility. However, issues regarding documentation and indexing still persists, prompting the research for potential solutions.
-	
-\end{adjustwidth}
+			Although the use of CAD have improved the overall design and manufacturing process, they also pose their own set of issues. For example, CAD software developers often employ their own proprietary file formats, each with their own complex structures. This results in major incompatibility issues as users might have different tooling preferences. As a result, international governing bodies such as International Organization for Standardization (ISO) have developed universal CAD file formats such as STEP to handle the issue of compatibility. A STEP file consists of components that each describe geometric data using a language called EXPRESS \parencite{step_iso_pratt}. Another universal CAD file format include STL designed by 3D Systems in 1987, which contains a set of triangles consisting of facets and vertices \parencite{stl_nagy}. Other issues include difficulties in documentation and indexing for existing CAD designs, as the complexity of the file's structure inhibit the use of automated annotation and indexing tools, forcing the use of manual annotation. However, issues regarding documentation and indexing still persists, prompting the research for potential solutions.
+		\end{indentedblock}
 
 \section{Problem Formulation}
-\begin{adjustwidth}{4em}{0pt}
-	
-	There are multiple issues relating to CAD design annotation, one example being that manual annotation incurs an unnecessary overhead, diverting manpower and time away from the main design process. Furthermore, manual annotation also introduce risks regarding annotation quality and accuracy, as human annotators might miss important details or mislabel important components, reducing overall workflow efficiency \parencite{gnn_mandelli}. Difficulties in determining annotation formats and standards increases risk of errors, which is especially noticeable when dealing with third-party designs.
-	 
-	\skiplines{1}
-	
-	The development of artificial intelligence (AI) have resulted in new techniques for automating the process, however most AI-based methods and models require the use of additional conversion steps into images and/or point clouds to leverage existing image processing and computer vision techniques \parencite{gnn_mandelli}. This added steps reduce the overall efficiency and increases the risk of misidentification/misclassification. This study aims to develop a novel method for processing CAD files which preserves the existing semantic context and connections between the parts without the need for additional conversion steps into visual representations. Additionally, current state-of-the-art (SotA) models such as Gemini 3 and Chat-GPT 5.1 overly rely on the existing metadata contained in the file, completely bypassing the geometry of the design. Other issues related to these models include privacy and latency concerns due to the necessity for an internet connection, as well as high computational and energy costs as the models are designed for general use \parencite{}.
-	
-\end{adjustwidth}
+	\begin{indentedblock}{4em}{0pt}
+		There are multiple issues relating to CAD design annotation, one example being that manual annotation incurs an unnecessary overhead, diverting manpower and time away from the main design process. Furthermore, manual annotation also introduce risks regarding annotation quality and accuracy, as human annotators might miss important details or mislabel important components, reducing overall workflow efficiency \parencite{gnn_mandelli}. Difficulties in determining annotation formats and standards increases risk of errors, which is especially noticeable when dealing with third-party designs.
+		 
+		\skiplines{1}
+		
+		The development of artificial intelligence (AI) have resulted in new techniques for automating the process, however most AI-based methods and models require the use of additional conversion steps into images and/or point clouds to leverage existing image processing and computer vision techniques \parencite{gnn_mandelli}. This added steps reduce the overall efficiency and increases the risk of misidentification/misclassification. This study aims to develop a novel method for processing CAD files which preserves the existing semantic context and connections between the parts without the need for additional conversion steps into visual representations. Additionally, current state-of-the-art (SotA) models such as Gemini 3 and Cha:t-GPT 5.1 overly rely on the existing metadata contained in the file, completely bypassing the geometry of the design. Other issues related to these models include privacy and latency concerns due to the necessity for an internet connection, as well as high computational and energy costs as the models are designed for general use \parencite{llm_energy_usage_odonnell}.
+		
+	\end{indentedblock}
 
 \section{Research Objectives}
-\begin{adjustwidth}{4em}{0pt}
+\begin{indentedblock}{4em}{0pt}
 	
 	Based on the topic discussed in the Problem Statement section, this study aims to complete the following research objectives:
 	
@@ -37,7 +58,7 @@
 			Generate accurate description for given CAD STEP file using novel transformer-based model.
 		}
 		\item {
-			Bridging the modality gap between human language and 3D geometric data (points, lines, etc).
+			Accurately translate geometric data (points, lines, shapes) into human language.
 		}
 		\item {
 			Enhance CAD file indexing by leveraging model-generated descriptions as semantic metadata.
@@ -48,10 +69,10 @@
 	\end{enumerate}
 	
 	
-\end{adjustwidth}
+\end{indentedblock}
 
 \section{Significance of Study}
-\begin{adjustwidth}{4em}{0pt}
+\begin{indentedblock}{4em}{0pt}
 	
 	This study's significance and contributions towards existing literature are detailed as follows:
 
@@ -67,10 +88,10 @@
 		}
 	\end{enumerate}
 	
-\end{adjustwidth}
+\end{indentedblock}
 
 \section{Limitation of Study}
-\begin{adjustwidth}{4em}{0pt}
+\begin{indentedblock}{4em}{0pt}
 	\fontsize{12pt}{\baselineskip}\selectfont
 	The following study lists the following limitations and potential improvements:
 	\begin{enumerate}
@@ -82,12 +103,12 @@
 		}
 		\item \textbf{Sparse classes:} The model's training data only consists of general common objects which can be easily found in public datasets in order to maximize the accuracy of the model. This is due to the scarcity of complex CAD designs in such datasets as they contain mostly reusable assets.
 	\end{enumerate}
-\end{adjustwidth}
+\end{indentedblock}
 
 \section{Organization of the report}
-\begin{adjustwidth}{4em}{0pt}
+\begin{indentedblock}{4em}{0pt}
 	\fontsize{12pt}{\baselineskip}\selectfont
 	The rest of the paper will be organized according to the following structure: Chapter II analyses the existing literature and basic terminologies required to understand the topic. Chapter III details the methodology used to gather the training dataset and the design considerations related to model development, from tokenizing, fine-tuning, to the benchmarking process. Chapter IV lists the results gathered during the benchmarking process paired with detailed analysis of said results. Lastly, Chapter V summarizes the conclusion obtained from the study as well as potential improvements for future research.
-\end{adjustwidth}
+\end{indentedblock}
 
 \endgroup
