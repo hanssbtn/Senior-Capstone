@@ -1,5 +1,5 @@
 \renewcommand{\thechapter}{\Roman{chapter}}
-\chapter{LITERATURE REVIEW}
+\chapter[]{LITERATURE REVIEW}
 \renewcommand{\thechapter}{\arabic{chapter}}
 
 \begingroup
@@ -58,7 +58,7 @@
 \section{Transformer Architecture}
 	\subsection{Architecture Overview}
 		\begin{indentedblock}{4em}{0pt}
-			Current state-of-the-art (SotA) embedding models are based on the transformer architecture, which acts as the foundation for commercial generative AI models such as ChatGPT, Gemini, DeepSeek, etc. Introduced in the seminal paper ``Attention Is All You Need'' by Vaswani \parencite{attention_is_all_you_need_vaswani}, instead of processing data sequentially, the architecture utilized a novel approach for sequence-processing tasks referred in the paper as self-attention, replacing the recurrent, in-order structures of previous models like recurrent neural networks (RNNs) and long short-term memory models (LSTMs) \parencites{attention_is_all_you_need_vaswani}{fundamentals_of_rnn_sherstinsky}{lstm_hochreiter}. 
+			Current state-of-the-art (SotA) embedding models are based on the transformer architecture, which acts as the foundation for commercial generative AI models such as ChatGPT, Gemini, DeepSeek, etc. Introduced in the seminal paper ``Attention Is All You Need'' by Vaswani \parencite{attention_is_all_you_need_vaswani}, instead of processing data sequentially, the architecture utilized a novel approach for sequence-processing tasks referred in the paper as self-attention, replacing the recurrent, in-order structures of previous models like recurrent neural networks (RNNs) and long short-term memory models (LSTMs) \parencites{fundamentals_of_rnn_sherstinsky}{lstm_hochreiter}. 
 			
 			\skiplines{1}
 			
@@ -66,7 +66,15 @@
 			
 			\skiplines{1}
 			
-			The self-attention mechanism detailed in the transformer architecture improves upon previous systems by enabling models to evaluate the importance of the surrounding parts of an input sequence, regardless of its ordering. For instance, consider the sentence ``The dog barked at the cat to drive it away.'' Using self-attention, transformer-based models can correctly associate the word ``it'' with the word ``cat'' rather than ``dog'' \parencite{attention_is_all_you_need_vaswani}. This capability of handling remote dependencies and understand context allows it to outperform previous architectures. The details of the mechanism lies in the novel components that make up the architecture, forming a deep network. In particular, the transformer model's functionality and reliability is the outcome from combining two key components, encoders and decoders. 
+			The self-attention mechanism detailed in the transformer architecture improves upon previous systems by enabling models to evaluate the importance of the surrounding parts of an input sequence, regardless of its ordering. For instance, consider the sentence ``The dog barked at the cat to drive it away.'' Using self-attention, transformer-based models can correctly associate the word ``it'' with the word ``cat'' rather than ``dog'' \parencite{attention_is_all_you_need_vaswani}. This capability of handling remote dependencies and understand context allows it to outperform previous architectures. The details of the mechanism lies in the novel components that make up the architecture, forming a deep network. In particular, the transformer model's functionality and reliability is the outcome from combining two key components, encoders and decoders. \autoref{fig:encoder-decoder} details the architecture of a standard transformer.
+			
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.5\linewidth]{"../Images/ENCODER DECODER"}
+				\caption{Standard Transformer Architecture consisting of an Encoder and Decoder \parencite{attention_is_all_you_need_vaswani}}
+				\label{fig:encoder-decoder}
+			\end{figure}
+			
 		\end{indentedblock} 
 	\subsection{Encoder-Decoder}
 		\begin{indentedblock}{4em}{0pt}
@@ -99,7 +107,7 @@
 				}
 			\end{enumerate}
 			
-			Enabling effective training of densely-layered networks require proper integration of the encoder and decoder. To meet these requirements, two operations are applied post-encoding and decoding to ensure stability and effective training. The integration involves adding a residual connection layer that adds the original input vector with the output to minimize the vanishing gradient problem. Next, the vectors are normalized and stabilized, ensuring a smoother and reliable training process \parencite{attention_is_all_you_need_vaswani}. The architectural decisions that make up the model allows the connections between each token to be filtered and strengthened based on the input's context, and allows the model to retain more information from its training data \parencite{attention_is_all_you_need_vaswani}.
+			Enabling effective training of densely-layered networks require proper integration of the encoder and decoder. To meet these requirements, two operations are applied post-encoding and decoding to ensure stability and effective training. The integration involves adding a residual connection layer that adds the original input vector with the output to minimize the vanishing gradient problem. Next, the vectors are normalized and stabilized, ensuring a smoother and reliable training process. The architectural decisions that make up the model allows the connections between each token to be filtered and strengthened based on the input's context, and allows the model to retain more information from its training data \parencite{attention_is_all_you_need_vaswani}.
 		\end{indentedblock}
 \section{Related Works}
 	\begin{indentedblock}{4em}{0pt}
@@ -115,7 +123,23 @@
 		
 		\skiplines{1}
 		
-		Another method applies a Feature Directed Acyclic Graph (FDAG) to determine the dependency between the shapes of CAD models which are then optimized until only the fundamental features and shapes remain. The shapes can then be compared to CAD models to determine their resemblance to the shapes used as a query \parencite{cnn_li}. One graph based method also utilizes the structure of STEP files to generate an attribute graph which can then be used as a measure for shape similarity \parencites{cad_el_mehalawi}{indexing_el_mehalawi}. Although the methods above are able to determine other objects with similar shapes, the method relies on the user's knowledge of the general shapes that define each object category. This paper aims to fill identified research gaps mentioned through implementing a novel framework for analyzing CAD files using transformer based architecture.
+		Another method applies a Feature Directed Acyclic Graph (FDAG) to determine the dependency between the shapes of CAD models which are then optimized until only the fundamental features and shapes remain. The shapes can then be compared to CAD models to determine their resemblance to the shapes used as a query \parencite{cnn_li}. One graph based method also utilizes the structure of STEP files to generate an attribute graph which can then be used as a measure for shape similarity \parencites{cad_el_mehalawi}{indexing_el_mehalawi}. However, while these graph-theoretic approaches excel at topological retrieval, they remain disconnected from the semantic intent of the design. 
+		
+		\skiplines{1}
+		
+		To bridge the gap between geometric topology and natural language, recent frameworks have turned to multi-modal learning. Text2CAD provides a seminal contribution by pairing natural language with CAD geometry, its methodology relies entirely on Programmatic Synthesis \parencite{text2cad_khan}. The dataset is constructed by first generating CAD scripts and then using Large Language Models (LLMs) to reverse-engineer textual descriptions from the code. Nevertheless, the approach introduces a research gap as real-world industry STEP files (ISO 10303-21) rarely contain the clean construction history (e.g., Extrude, Revolve) found in Text2CAD. \autoref{fig:text2cad} details the overall flow of Text2CAD. They are often fixed Boundary Representations (B-Reps) containing only explicit surfaces and topology. Therefore, a model trained solely on Text2CAD fails to interpret the vast majority of preexisting CAD files. Moreover, the research focuses on generating the step-by-step geometric operations required for reconstruction (e.g. "Extrude by 2cm"). While this results in precise parametric descriptions, the model effectively describes the object's recipe without understanding what the object is. For instance, while it may generate highly accurate construction steps for a set of interlocking toothed cylinders and shafts by specifying exact relative measurements for every extrude and cut, it frequently fails to recognize or categorize the resulting assembly by its fundamental functional identity: a Gearbox. Consequently, the model provides the fabrication steps but lacks the capability to semantically categorize said object.
+		
+		\skiplines{1}
+		
+		To overcome the dependency on synthetic construction history and the lack of functional understanding, this study introduces a tokenizer and annotation pipeline designed explicitly for Reconstruction-Free B-Rep Graphs. Furthermore, to ensure the model captures the high-level semantic identity of components rather than just their geometric recipe, this research employs a Human-in-the-Loop (HITL) protocol to directly author and verify the dataset. This verification process guarantees that the descriptions align with the visual reality of the part, prioritizing functional categorization over procedural fabrication.
+		
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.7\linewidth]{../Images/Text2CAD}
+			\caption{Text2CAD Annotation Generation Pipeline \parencite{text2cad_khan}.}
+			\label{fig:text2cad}
+		\end{figure}
+		
 	\end{indentedblock}
-	
+=
 \endgroup

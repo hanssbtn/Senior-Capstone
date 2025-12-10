@@ -1,5 +1,5 @@
 \renewcommand{\thechapter}{\Roman{chapter}}
-\chapter{INTRODUCTION}
+\chapter[]{INTRODUCTION}
 \renewcommand{\thechapter}{\arabic{chapter}}
 
 \begingroup
@@ -23,11 +23,7 @@
 				\centering
 				\includegraphics[width=0.75\linewidth]{"../Images/CAD PROCESS FLOWCHART"}
 				\caption{\centering Flowchart of the CAD modeling process \parencite{cad_process_fleche}.}
-				\vspace{0.2cm} % Add a small gap
-%				\begin{minipage}{0.70\linewidth} % Keeps text width aligned with image
-%					\footnotesize % Notes are usually a bit smaller
-%					
-%				\end{minipage}
+				\vspace{0.2cm} 
 				\label{fig:cad_process_flowchart}
 			\end{figure}
 			
@@ -55,16 +51,16 @@
 	
 	\begin{enumerate}
 		\item {
-			Generate accurate description for given CAD STEP file using novel transformer-based model.
+			Generate accurate description for given CAD STEP file using novel transformer-based model. Accuracy is measured using the BERTScore metric defined in the Methodology Section.
 		}
 		\item {
-			Accurately translate geometric data (points, lines, shapes) into human language.
+			Accurately translate geometric data (points, lines, shapes) into human language. (at least 80-90\% correct identification.)
 		}
 		\item {
 			Enhance CAD file indexing by leveraging model-generated descriptions as semantic metadata.
 		}
 		\item {
-			Enable low latency inference  using compact, topology-aware tokenizer. 
+			Enable low latency inference  using compact, topology-aware tokenizer. (At least < 1s inference time for any given input model).
 		}
 	\end{enumerate}
 	
@@ -106,9 +102,8 @@
 \end{indentedblock}
 
 \section{Organization of the report}
-\begin{indentedblock}{4em}{0pt}
-	\fontsize{12pt}{\baselineskip}\selectfont
-	The rest of the paper will be organized according to the following structure: Chapter II analyses the existing literature and basic terminologies required to understand the topic. Chapter III details the methodology used to gather the training dataset and the design considerations related to model development, from tokenizing, fine-tuning, to the benchmarking process. Chapter IV lists the results gathered during the benchmarking process paired with detailed analysis of said results. Lastly, Chapter V summarizes the conclusion obtained from the study as well as potential improvements for future research.
-\end{indentedblock}
-
+	\begin{indentedblock}{4em}{0pt}
+		\fontsize{12pt}{\baselineskip}\selectfont
+		The rest of the paper will be organized according to the following structure: Chapter II analyses the existing literature and basic terminologies required to understand the topic. Chapter III details the methodology used to gather the training dataset and the design considerations related to model development, from tokenizing, fine-tuning, to the benchmarking process. Chapter IV lists the results gathered during the benchmarking process paired with detailed analysis of said results. Lastly, Chapter V summarizes the conclusion obtained from the study as well as potential improvements for future research.
+	\end{indentedblock}
 \endgroup

@@ -1,5 +1,6 @@
 \begin{titlepage}
 	\begin{center}
+		\fontsize{14pt}{\baselineskip}\selectfont
 		\vfill
 		\textbf{\TITLE} 
 		
@@ -11,21 +12,32 @@
 		\skiplines{8}
 		\textbf{UNDERGRADUATE FINAL YEAR PROJECT}
 		
-		\skiplines{3} 
+		\skiplines{4}
+		 
 		\textbf{\AUTHOR} 
 		
 		\textbf{\STUDENTID}
 		
-		\skiplines{3}
+		\skiplines{5}
+		
 		\begin{table}[!ht]
 			\centering
-			\begin{tabular}{cc}
-				\textbf{Supervisor 1:} & \textbf{Supervisor 2:} \\
-				&\\[1\baselineskip]
-				%				\includegraphics{../Images/signature.jpeg}&\includegraphics{../Images/signature.jpeg} \\
-				&\\[1\baselineskip]
-				\textbf{Supervisor 1 Name with title} & \textbf{Supervisor 2 Name with title}\\
-			\end{tabular}
+			\begin{table}[!htb]
+				\centering
+				\begin{tblr}{
+						width=\linewidth, 
+						colspec={
+							Q[c,m,7cm]  
+							Q[c,m,7cm]    
+						}
+					}
+					\textbf{Supervisor 1:} & \textbf{Supervisor 2:} \\
+					&\\[1\baselineskip]
+					%				\includegraphics{../Images/signature.jpeg}&\includegraphics{../Images/signature.jpeg} \\
+					&\\[1\baselineskip]\
+					\textbf{\SUPERVISORONE} & \textbf{\SUPERVISORTWO}\\
+				\end{tblr}
+			\end{table}
 		\end{table}
 		
 		\textbf{\the\year}

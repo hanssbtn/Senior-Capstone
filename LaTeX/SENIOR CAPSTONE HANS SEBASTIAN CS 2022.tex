@@ -3,7 +3,7 @@
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[style=ieee, backend=biber]{biblatex} 
+\usepackage[style=apa, backend=biber]{biblatex} 
 \usepackage{amsmath}
 \usepackage{ragged2e}
 \usepackage{mathptmx}
@@ -30,6 +30,13 @@
 \usepackage{eso-pic}
 \usepackage{xurl}
 \usepackage{wrapfig}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{lipsum}
+\usepackage{setspace}
+\usepackage{etoolbox}
+\usepackage{tocloft}
+\usepackage{xstring}
 
 \newcommand{\mathhl}[2]{\colorbox{#1}{$\displaystyle#2$}}
 
@@ -38,13 +45,52 @@
 
 \setcounter{secnumdepth}{4}
 
-\newcommand{\TITLE}{TITLE} 
+\newcommand{\TITLE}{STEP File Classification and Annotation using Transformer Architecture} 
 \newcommand{\AUTHOR}{Hans Sebastian} 
 \newcommand{\STUDENTID}{2022390007} 
 \newcommand{\STUDYPROGRAM}{Computer Science} 
 \newcommand{\FACULTY}{Faculty of Engineering annd Technology} 
+\newcommand{\SUPERVISORONE}{Panji Darma. Ph.D}
+\newcommand{\SUPERVISORTWO}{Supervisor 2 Name with title}
+\newcommand{\SHORTTITLE}{STEP File Classification}
+\newcommand{\SHORTFACULTY}{FET}
+\newcommand{\UNIVERSITY}{Sampoerna University}
 
 \renewcommand{\sectionautorefname}{Section}
+\renewcommand{\abstractname}{\fontsize{14pt}{1.5\baselineskip}\selectfont ABSTRACT\vspace*{\baselineskip}}
+
+\newlistof{listofequations}{los}{LIST OF EQUATIONS}
+
+\newcommand{\addtoLoS}[2]{
+	\addcontentsline{listofequations}{los}{\protect\makebox[\cftlosnumwidth][l]{\protect\#\theequation} #1 -- #2}
+}
+
+\pagestyle{fancy}
+\fancyhf{} % Clear all defaults
+\renewcommand{\headrulewidth}{0pt} % Remove header line
+\renewcommand{\footrulewidth}{0pt}
+\fancyfoot[C]{
+	\thepage \\
+	\hfill\break
+	\scriptsize \SHORTTITLE \dots \AUTHOR, \SHORTFACULTY, \the\year{}}
+\fancyfoot[R]{%
+	\hfill\break
+	\footnotesize \textbf{\UNIVERSITY}
+}
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\renewcommand{\headrulewidth}{0pt} % Remove header line
+	\renewcommand{\footrulewidth}{0pt}
+	\fancyfoot[C]{
+		\thepage \\
+		\hfill\break
+		\scriptsize \SHORTTITLE \dots \AUTHOR, \SHORTFACULTY, \the\year{}}
+	\fancyfoot[R]{%
+		\hfill\break
+		\footnotesize \textbf{\UNIVERSITY}
+	}
+}
+
 
 \makeatletter
 \newcommand{\skiplines}{
@@ -64,7 +110,7 @@
 \makeatother
 
 \newcommand{\addimage}{\AddToShipoutPictureBG{%
-		\put(\LenToUnit{0.5\paperwidth},\LenToUnit{0.5\paperheight}){%
+		\put(\LenToUnit{0.5\paperwidth},\LenToUnit{0.675\paperheight}){%
 			\makebox(0.125\paperwidth,0){\includegraphics[trim={0in 0in 6.34in 0in}, clip, width=0.75\paperwidth]{../Images/UNIVERSITY LOGO BACKGROUND.png}}%
 		}%
 }}
@@ -103,7 +149,7 @@
 	{3.25ex plus 1ex minus .2ex} % 2. Vertical space before the title
 	{1.5ex plus .2ex} % 3. Vertical space after the title
 
-\captionsetup{width=0.7\linewidth}
+\captionsetup{width=0.7\linewidth, font=it}
 
 % A custom environment for indented first paragraph text
 \newenvironment{indentedblock}[2]
@@ -118,9 +164,17 @@
 	\input{Thesis Title Page.tex}
 	\input{Thesis Supervisor Signature Page.tex}
 	\addimage
+	\input{Thesis Declaration of Originality.tex}
+	\input{Thesis Exclusive Right Statement.tex}
+	\input{Thesis Acknowledgement.tex}
+	% Print table of contents
+	\input{Thesis Tables.tex}
+%	\listoffigures
+%	\listoftables
+	\input{Thesis Abstract Page.tex}
 	\input{Thesis Introduction Page.tex}
 	\input{Thesis Literature Review Page.tex}
-	\input{Thesis Proposed Methodology Page.tex}
+	\input{Thesis Methodology Page.tex}
 
 %	\input{Thesis Results and Discussion Page.tex}
 %   \input{Thesis Conclusion Page.tex}

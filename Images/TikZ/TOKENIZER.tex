@@ -1,0 +1,175 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, fit, backgrounds, shadows}
+
+\begin{document}
+	
+	\begin{tikzpicture}[
+		font=\sffamily,
+		% --- STYLES ---
+		% 1. The White Operation Blocks
+		op_block/.style={
+			rectangle, 
+			draw=gray!60!black, 
+			fill=white, 
+			thick,
+			rounded corners=4pt, 
+			align=center, 
+			font=\small, 
+			inner sep=8pt, 
+			text width=4.2cm, 
+			minimum height=1.2cm,
+			drop shadow={opacity=0.15, shadow xshift=2pt, shadow yshift=-2pt}
+		},
+		% 2. The Blue Stage Containers
+		stage_box/.style={
+			draw=blue!50!gray, 
+			thick, 
+			fill=blue!5, 
+			rounded corners=8pt, 
+			inner sep=15pt, 
+			inner ysep=25pt
+		},
+		% 3. The Green/Purple Stream Blocks (for Stage 4)
+		stream_block/.style={
+			rectangle, 
+			draw=gray!60!black, 
+			thick,
+			rounded corners=4pt, 
+			align=center, 
+			font=\small, 
+			inner sep=8pt,
+			minimum height=2cm,
+			text width=3.5cm
+		},
+		% 4. Titles
+		stage_title/.style={
+			font=\bfseries\large, 
+			color=blue!40!black, 
+			align=center
+		},
+		% 5. Connectors
+		line/.style={
+			->, 
+			>=Stealth, 
+			very thick, 
+			color=gray!70!black, 
+			rounded corners=5pt
+		},
+		tokenizer_frame/.style={
+			draw=gray!40,
+			dashed,
+			line width=2pt,
+			fill=none,
+			rounded corners=20pt,
+			inner sep=0.8cm
+		},
+		node distance=1.5cm		
+		]
+		
+		% =========================================================
+		% ROW 1: PRE-PROCESSING (Invariance)
+		% =========================================================
+		
+		% --- STAGE 1 (Top Left) ---
+		\node[op_block] (s1_step1) {Scan for Sub-structures};
+		\node[op_block, below=0.6cm of s1_step1] (s1_step2) {Collapse into Macros\\e.g., \texttt{<CYLINDER\_PRIM>}};
+		\node[stage_title, above=0.2cm of s1_step1] (s1_title) {Stage 1:\\Semantic Macro-Compression};
+		
+		% Internal Arrow
+		\draw[line] (s1_step1) -- (s1_step2);
+		
+		% Fit Box
+		\begin{scope}[on background layer]
+			\node[stage_box, fit=(s1_title) (s1_step1) (s1_step2)] (stage1) {};
+		\end{scope}
+		
+		% --- STAGE 2 (Top Right) ---
+		% Align relative to Stage 1 to maintain grid
+		\node[op_block, right=5cm of s1_step1] (s2_step1) {1. Centering\\(Translate to Origin)};
+		\node[op_block, below=0.6cm of s2_step1] (s2_step2) {2. PCA Alignment\\(Rotate to Z-Axis)};
+		\node[stage_title, above=0.2cm of s2_step1] (s2_title) {Stage 2:\\Canonical Normalization};
+		
+		% Internal Arrow
+		\draw[line] (s2_step1) -- (s2_step2);
+		
+		% Fit Box
+		\begin{scope}[on background layer]
+			\node[stage_box, fit=(s2_title) (s2_step1) (s2_step2)] (stage2) {};
+		\end{scope}
+		
+		% =========================================================
+		% ROW 2: SERIALIZATION
+		% =========================================================
+		
+		% --- STAGE 3 (Bottom Left) ---
+		% Align directly below Stage 1
+		\node[op_block, below=4.5cm of s1_step2] (s3_step1) {Identify Parent $N_p$};
+		\node[op_block, below=0.6cm of s3_step1] (s3_step2) {Sort Children by $f(c)$ \\(e.g., Surface Area)};
+		\node[stage_title, above=0.2cm of s3_step1] (s3_title) {Stage 3:\\Topological Linearization};
+		
+		% Internal Arrow
+		\draw[line] (s3_step1) -- (s3_step2);
+		
+		% Fit Box
+		\begin{scope}[on background layer]
+			\node[stage_box, fit=(s3_title) (s3_step1) (s3_step2)] (stage3) {};
+		\end{scope}
+		
+		% --- STAGE 4 (Bottom Right) ---
+		% Align directly below Stage 2
+		% We use a coordinate to ensure the streams are centered under Stage 2
+		\coordinate (stage4_center) at (stage2.center |- stage3.center);
+		
+		\node[stream_block, fill=green!5, draw=green!60!black] (streamA) at (stage4_center) [xshift=-2.2cm, yshift=-0.5cm] {\textbf{Stream A}\\(Semantic Tokens)\\\vspace{4pt}\texttt{<FACE>}, \texttt{<EDGE>}};
+		
+		\node[stream_block, fill=purple!5, draw=purple!60!black, right=0.5cm of streamA] (streamB) {\textbf{Stream B}\\(Geometric Embeddings)\\\vspace{4pt}$z = r + i\theta$};
+		
+		\node[stage_title] (s4_title) at ($(streamA.north)!0.5!(streamB.north) + (0, 0.7)$) {Stage 4:\\Dual-Stream Encoding};
+		
+		% Fit Box
+		\begin{scope}[on background layer]
+			\node[stage_box, fit=(s4_title) (streamA) (streamB)] (stage4) {};
+		\end{scope}
+		
+		% =========================================================
+		% CONNECTIONS (The Flow)
+		% =========================================================
+		
+		% 1. Stage 1 -> Stage 2
+		\draw[line] (stage1) -- node[above, font=\small\bfseries, color=gray] {Macro Graph} (stage2);
+		
+		% 2. Stage 2 -> Stage 3 (Down and Left)
+		% We draw a line out the bottom of S2, down, then over to top of S3
+		\draw[line, rounded corners=10pt] (stage2.south) -- ++(0,-0.5) -| (stage3.north);
+		
+		% 3. Stage 3 -> Stage 4
+		\draw[line] (stage3.east) -- node[above, font=\small\bfseries, color=gray, text width=2.5cm, align=center] {Token Sequence} (stage4.west |- stage4_center);
+		
+		% 4. Final Output Arrow (Coming out of Stage 4)
+		\node[right=1.5cm of stage4, font=\bfseries\large, align=center, color=gray!80!black] (output_label) {Final\\Tensor};
+		\draw[line] (stage4.east) -- (output_label.west);
+		
+		
+		% =========================================================
+		% INPUT LABEL
+		% =========================================================
+		\node[left=1.5cm of stage1, font=\bfseries\large, align=center, color=gray!80!black] (input_label) {Raw\\STEP File};
+		\draw[line] (input_label.east) -- (stage1.west);
+		
+		\path (stage1.north) ++(0, 1cm) coordinate (point);
+		\begin{scope}[on background layer]
+			% We fit all the extreme nodes: Input, Output, and the Stages
+			\node[
+			tokenizer_frame, 
+			fit=(input_label) (output_label) (stage1) (stage2) (stage3) (stage4) (point),
+			] (wrapper) {};
+			
+			% Add the label for the whole system
+			\node[font=\bfseries\LARGE, color=darkgray!80, anchor=north, inner sep=15pt] (tokenizer)
+			at (wrapper.north) {Proposed B-Rep Tokenizer};
+		\end{scope}
+		
+	\end{tikzpicture}
+\end{document}

@@ -7,3 +7,9 @@
 *.txt
 *.synctex.gz
 *.run.xml
+*.toc
+*.lof
+*.lot
+*.out
+
+

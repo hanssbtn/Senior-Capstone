@@ -1,0 +1,78 @@
+% Hack to make table of contents meet the Word Format
+% DO NOT TOUCH UNLESS YOU KNOW WHAT YOU'RE DOING
+% ----------------------------------------------------------------------------------
+\newlength{\dotwidth}
+\settowidth{\dotwidth}{.}
+
+\makeatletter
+\renewcommand{\contentsname}{\hfill\bfseries\fontsize{14pt}{1.5\baselineskip}\selectfont TABLE OF CONTENTS\hfill}
+
+\renewcommand{\cftaftertoctitleskip}{\baselineskip}
+\renewcommand{\cftdotfill}[1]{%
+	\parbox[b]{0pt}{}
+	\cleaders\hbox{$\m@th \mkern #1 mu\hbox{\cftdot}\mkern #1 mu$}\hfill
+}%
+
+\renewcommand{\cftdotsep}{0.1}
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\renewcommand{\cftchapleader}{\hspace{-\dotwidth}\bfseries\cftdotfill{\cftdotsep}}
+\renewcommand{\cftchappresnum}{CHAPTER }
+\renewcommand{\cftchapnumwidth}{6.5em}
+\renewcommand{\cftchapfillnum}[1]{%
+	{\cftchapleader}\nobreak
+	{\cftchappagefont #1}
+	\cftchapafterpnum\par
+}
+
+\renewcommand{\cftsecfillnum}[1]{%
+	{\cftsecleader}\nobreak
+	{\cftsecpagefont #1}
+	\cftsecafterpnum\par
+}
+\renewcommand{\cftsecleader}{\hspace{-\dotwidth}\bfseries\cftdotfill{\cftdotsep}}
+\setlength{\cftsecindent}{1em}
+
+\renewcommand{\cftsubsecfillnum}[1]{%
+	{\cftsubsecleader}\nobreak
+	{\cftsubsecpagefont #1}
+	\cftsubsecafterpnum\par
+}
+\setlength{\cftsubsecindent}{2em}
+
+\renewcommand{\cftsubsecleader}{\hspace{-\dotwidth}\cftdotfill{\cftdotsep}}
+
+\renewcommand{\cftsubsubsecfillnum}[1]{%
+	{\cftsubsubsecleader}\nobreak
+	{\cftsubsubsecpagefont #1}
+	\cftsubsubsecafterpnum\par
+}
+\renewcommand{\cftsubsubsecleader}{\hspace{-\dotwidth}\cftdotfill{\cftdotsep}}
+\setlength{\cftsubsubsecindent}{3em}
+
+\makeatother
+% ----------------------------------------------------------------------------------
+
+\begingroup
+	\makeatletter
+	% Hack to make the dots meet the titles
+	% DO NOT TOUCH UNLESS YOU KNOW WHAT YOU'RE DOING
+	\renewcommand{\numberline}[1]{%
+		\IfSubStr{#1}{.}{%
+			#1
+		}{%
+			\textbf{CHAPTER #1}%
+		}%
+	}%
+	\renewcommand{\listtablename}{\hfill\bfseries\fontsize{14pt}{1.25\baselineskip}\selectfont LIST OF TABLES\hfill}
+	\renewcommand{\listfigurename}{\hfill\bfseries\fontsize{14pt}{1.25\baselineskip}\selectfont LIST OF FIGURES\hfill}
+	
+	\makeatother
+	\tableofcontents
+	\pagebreak
+	\listoffigures
+	\pagebreak
+	\listoftables
+	\pagebreak
+
+\endgroup
