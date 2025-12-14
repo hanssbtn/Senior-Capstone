@@ -31,16 +31,20 @@
 			
 			\skiplines{1}
 		
-			Although the use of CAD have improved the overall design and manufacturing process, they also pose their own set of issues. For example, CAD software developers often employ their own proprietary file formats, each with their own complex structures. This results in major incompatibility issues as users might have different tooling preferences. As a result, international governing bodies such as International Organization for Standardization (ISO) have developed universal CAD file formats such as STEP to handle the issue of compatibility. A STEP file consists of components that each describe geometric data using a language called EXPRESS \parencite{step_iso_pratt}. Another universal CAD file format include STL designed by 3D Systems in 1987, which contains a set of triangles consisting of facets and vertices \parencite{stl_nagy}. Another problem comes with difficulties in documentation and indexing for existing CAD designs, as the complexity of the file's structure inhibit the use of automated annotation and indexing tools, forcing the use of manual annotation. Although the universal file formats help with compatibility between different CAD software, issues regarding documentation and indexing still persists, prompting the research for potential solutions.
+			Although the use of CAD have improved the overall design and manufacturing process, they also pose their own set of issues. For example, CAD software developers often employ their own proprietary file formats, each with their own complex structures. This results in major incompatibility issues as users might have different tooling preferences. As a result, international governing bodies such as International Organization for Standardization (ISO) have developed universal CAD file formats such as STEP to handle the issue of compatibility. A STEP file consists of components that each describe geometric data using a language called EXPRESS \parencite{step_iso_pratt}. Another universal CAD file format include STL designed by 3D Systems in 1987, which contains a set of triangles consisting of facets and vertices \parencite{stl_nagy}.
+			
+			\skiplines{1}
+			
+			 Another problem comes with difficulties in documentation and indexing for existing CAD designs, as the complexity of the file's structure inhibit the use of automated annotation and indexing tools, forcing the use of manual annotation. This procedure, although viable for small designs, quickly becomes time consuming and error-prone as the size of a project grows. Although the universal file formats help with compatibility between different CAD software, issues regarding documentation and indexing still persists, prompting the research for potential solutions.
 		\end{indentedblock}
 
 \section{Problem Formulation}
 	\begin{indentedblock}{4em}{0pt}
-		There are multiple issues relating to CAD design annotation, one example being that manual annotation incurs an unnecessary overhead, diverting manpower and time away from the main design process. Furthermore, manual annotation also introduce risks regarding annotation quality and accuracy, as human annotators might miss important details or mislabel important components, reducing overall workflow efficiency \parencite{gnn_mandelli}. Difficulties in determining annotation formats and standards increases risk of errors, which is especially noticeable when dealing with third-party designs.
+		There are multiple issues relating to CAD design annotation, one example being that manual annotation incurs an unnecessary overhead, diverting manpower and time away from the main design process. Furthermore, manual annotation also introduce risks regarding annotation quality and accuracy, as human annotators might miss important details or mislabel important components, reducing overall workflow efficiency \parencite{gnn_mandelli}. Difficulties in determining annotation formats and standards also increases risk of errors, which is especially noticeable when dealing with third-party designs.
 		 
 		\skiplines{1}
 		
-		The development of artificial intelligence (AI) have resulted in new techniques for automating the process, however most AI-based methods and models require the use of additional conversion steps into images and/or point clouds to leverage existing image processing and computer vision techniques \parencite{gnn_mandelli}. This added steps reduce the overall efficiency and increases the risk of misidentification/misclassification. This study aims to develop a novel method for processing CAD files which preserves the existing semantic context and connections between the parts without the need for additional conversion steps into visual representations. Additionally, current state-of-the-art (SotA) models such as Gemini 3 and Cha:t-GPT 5.1 overly rely on the existing metadata contained in the file, completely bypassing the geometry of the design. Other issues related to these models include privacy and latency concerns due to the necessity for an internet connection, as well as high computational and energy costs as the models are designed for general use \parencite{llm_energy_usage_odonnell}.
+		The development of artificial intelligence (AI) have resulted in new techniques for automating the process, however most AI-based methods and models require the use of additional conversion steps into images and/or point clouds to leverage existing image processing and computer vision techniques \parencite{gnn_mandelli}. This added steps reduce the overall efficiency and increases the risk of misclassification. Additionally, current state-of-the-art (SotA) models such as Gemini 3 and Chat-GPT 5.2 overly rely on the existing metadata contained in the file, completely bypassing the geometry of the design. Other issues related to these models include privacy and latency concerns due to the necessity for an internet connection, as well as high computational and energy costs as the models are designed for general use \parencite{llm_energy_usage_odonnell}. This study aims to develop a novel method for processing CAD files which preserves the existing semantic context and connections between the parts without the need for additional conversion steps into visual representations.
 		
 	\end{indentedblock}
 
@@ -69,21 +73,17 @@
 
 \section{Significance of Study}
 	\begin{indentedblock}{4em}{0pt}
-		
 		This study's significance and contributions towards existing literature are detailed as follows:
 	
 		\begin{enumerate}
-			\item {
-				\textbf{Direct B-Rep Processing:} 
-				Eliminates the need for lossy conversion to 2D images or voxels by processing raw STEP files directly, preserving high-fidelity NURBS geometry and topological relationships \parencite{gnn_mandelli}.
+			\item { 
+				Enable faster development and project organization with automatic STEP CAD file annotation.
 			}
 			\item {
-				\textbf{History-Agnostic Classification:} 
-				Overcomes the reliance on synthetic construction history found in existing datasets (e.g., Text2CAD) by extracting functional identity from static B-Rep graphs, making the model applicable to standard industry files \parencite{text2cad_khan}.
+				Develop an precision-preserving parsing method for \textbf{Boundary Representation} (B-Rep) data in STEP files.
 			}
 			\item {
-				\textbf{Novel Graph Serialization:} 
-				Introduces a \textbf{Hierarchical Dual-Stream Tokenizer} that resolves graph isomorphism ambiguity in non-Euclidean data, ensuring deterministic processing of scrambled geometric entities \parencite{deepcad_wu}.
+				Introduce a \textbf{Hierarchical Dual-Stream Tokenizer} that converts complex 3D connections into a deterministic sequence, enabling the Transformer to consistently identify parts regardless of file scrambling \parencite{deepcad_wu}.
 			}
 		\end{enumerate}
 		
