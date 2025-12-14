@@ -1,9 +1,20 @@
 \documentclass[12pt,a4paper]{extreport}
-\usepackage[top=1.18in, bottom=0.98in, left=1.18in, right=1.18in]{geometry}
+\usepackage[
+left=4cm,   
+top=3cm,     
+right=3cm,   
+bottom=3cm,  
+headheight=15pt,  
+headsep=1cm,
+footskip=0.5cm
+]{geometry}
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[style=apa, backend=biber]{biblatex} 
+\usepackage[backend=biber,
+bibstyle=ieee, 
+citestyle=authoryear,
+sorting=nyt]{biblatex} 
 \usepackage{amsmath}
 \usepackage{ragged2e}
 \usepackage{mathptmx}
@@ -58,6 +69,19 @@
 
 \renewcommand{\sectionautorefname}{Section}
 \renewcommand{\abstractname}{\fontsize{14pt}{1.5\baselineskip}\selectfont ABSTRACT\vspace*{\baselineskip}}
+\defbibheading{references_head}{%
+	\begin{center}
+		\fontsize{14pt}{21pt}\selectfont \textbf{REFERENCES}\par
+		\vspace{21pt}
+	\end{center}%
+}
+
+\newcommand{\OLDthebibliography}[1]{\thebibliography{#1}}
+\renewcommand\thebibliography[1]{
+	\OLDthebibliography{#1}
+	\setlength{\parskip}{0pt}
+	\setlength{\itemsep}{0pt plus 0.3ex}
+}
 
 \newlistof{listofequations}{los}{LIST OF EQUATIONS}
 
@@ -70,7 +94,7 @@
 \renewcommand{\headrulewidth}{0pt} % Remove header line
 \renewcommand{\footrulewidth}{0pt}
 \fancyfoot[C]{
-	\thepage \\
+	\textbf{\thepage} \\
 	\hfill\break
 	\scriptsize \SHORTTITLE \dots \AUTHOR, \SHORTFACULTY, \the\year{}}
 \fancyfoot[R]{%
@@ -82,7 +106,7 @@
 	\renewcommand{\headrulewidth}{0pt} % Remove header line
 	\renewcommand{\footrulewidth}{0pt}
 	\fancyfoot[C]{
-		\thepage \\
+		\textbf{\thepage} \\
 		\hfill\break
 		\scriptsize \SHORTTITLE \dots \AUTHOR, \SHORTFACULTY, \the\year{}}
 	\fancyfoot[R]{%
@@ -110,8 +134,8 @@
 \makeatother
 
 \newcommand{\addimage}{\AddToShipoutPictureBG{%
-		\put(\LenToUnit{0.5\paperwidth},\LenToUnit{0.675\paperheight}){%
-			\makebox(0.125\paperwidth,0){\includegraphics[trim={0in 0in 6.34in 0in}, clip, width=0.75\paperwidth]{../Images/UNIVERSITY LOGO BACKGROUND.png}}%
+		\put(\LenToUnit{0.51\paperwidth},\LenToUnit{0.69\paperheight}){%
+			\makebox(0.125\paperwidth,0){\includegraphics[trim={0in 0in 6.34in 0in}, clip, width=0.7\paperwidth]{../Images/UNIVERSITY LOGO BACKGROUND.png}}%
 		}%
 }}
 
@@ -138,6 +162,11 @@
 	{\thesubsubsection}
 	{1em}
 	{}
+	
+\titlespacing*{\chapter}
+	{0pt}                   % Left margin
+	{-15pt}                   % Vertical space BEFORE title (Set to 0pt to hit the top margin)
+	{14pt}                  % Vertical space AFTER title (Adjust this to match your Word doc)
 
 \titlespacing{\subsection}
 	{2em} % 1. Left margin indentation
@@ -157,6 +186,7 @@
 	{\end{adjustwidth}} % End
 
 \addbibresource{../References/references.bib}
+\DeclareDelimFormat{nameyeardelim}{\addcomma\space}
 
 \AtBeginEnvironment{bibliography}{\fontsize{12pt}{\baselineskip}\selectfont}
 
@@ -178,5 +208,6 @@
 
 %	\input{Thesis Results and Discussion Page.tex}
 %   \input{Thesis Conclusion Page.tex}
-	\printbibliography
+	\pagebreak
+	\printbibliography[heading=references_head]
 \end{document}

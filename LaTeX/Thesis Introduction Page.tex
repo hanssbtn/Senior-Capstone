@@ -51,16 +51,16 @@
 	
 	\begin{enumerate}
 		\item {
-			Generate accurate description for given CAD STEP file using novel transformer-based model. Accuracy is measured using the BERTScore metric defined in the Methodology Section.
+			Develop a Transformer-based system capable of generating high-fidelity functional descriptions for unlabelled STEP files, validated against human-authored ground truth using BERTScore.
 		}
 		\item {
-			Accurately translate geometric data (points, lines, shapes) into human language. (at least 80-90\% correct identification.)
+			Translating low-level B-Rep topology (e.g., NURBS curves, closed shells) into high-level semantic concepts (e.g., "Hexagonal Head", "Threaded Shaft") with $>80\%$ identification accuracy.
 		}
 		\item {
 			Enhance CAD file indexing by leveraging model-generated descriptions as semantic metadata.
 		}
 		\item {
-			Enable low latency inference  using compact, topology-aware tokenizer. (At least < 1s inference time for any given input model).
+			Enable low latency inference using a Hierarchical Dual-Stream Tokenizer architecture. (At least < 1s inference time for any given input model).
 		}
 	\end{enumerate}
 	
@@ -68,23 +68,26 @@
 \end{indentedblock}
 
 \section{Significance of Study}
-\begin{indentedblock}{4em}{0pt}
+	\begin{indentedblock}{4em}{0pt}
+		
+		This study's significance and contributions towards existing literature are detailed as follows:
 	
-	This study's significance and contributions towards existing literature are detailed as follows:
-
-	\begin{enumerate}
-		\item {
-			Enable faster development and project organization with automatic STEP CAD file annotation.
-		}
-		\item {
-			Develop a topology-first serialization strategy for STEP file B-rep graph
-		}
-		\item {
-			Advance existing classification models from general classification to generating detailed descriptions. 
-		}
-	\end{enumerate}
-	
-\end{indentedblock}
+		\begin{enumerate}
+			\item {
+				\textbf{Direct B-Rep Processing:} 
+				Eliminates the need for lossy conversion to 2D images or voxels by processing raw STEP files directly, preserving high-fidelity NURBS geometry and topological relationships \parencite{gnn_mandelli}.
+			}
+			\item {
+				\textbf{History-Agnostic Classification:} 
+				Overcomes the reliance on synthetic construction history found in existing datasets (e.g., Text2CAD) by extracting functional identity from static B-Rep graphs, making the model applicable to standard industry files \parencite{text2cad_khan}.
+			}
+			\item {
+				\textbf{Novel Graph Serialization:} 
+				Introduces a \textbf{Hierarchical Dual-Stream Tokenizer} that resolves graph isomorphism ambiguity in non-Euclidean data, ensuring deterministic processing of scrambled geometric entities \parencite{deepcad_wu}.
+			}
+		\end{enumerate}
+		
+	\end{indentedblock}
 
 \section{Limitation of Study}
 \begin{indentedblock}{4em}{0pt}
