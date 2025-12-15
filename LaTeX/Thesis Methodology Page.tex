@@ -90,7 +90,7 @@
 					\item \textbf{Exclusion Logic:} To prevent misclassification of assemblies, filenames containing "Assy" or "Assembly" are flagged and excluded from the single-part classification dataset, as assembly CAD files s inherently represent composite systems containing multiple distinct components (e.g., a gearbox comprising shafts, bearings, and housings). Including these files would introduce label ambiguity, as a single input graph would correspond to multiple conflicting functional classes, which is outside the research's scope.
 				\end{enumerate}
 				
-				Finally, while the hierarchical schema structure is retained for compatibility, the semantic objective of the annotation fields is redefined. Instead of describing the steps required to generate the object, the multi-level schema is used to categorize annotations of the same object based on their level of detail. \autoref{tab:annotation-level-table} below shows the defined annotation levels with an example for each level.
+				Finally, while the hierarchical schema structure is retained for compatibility, the semantic objective of the annotation fields is redefined. Instead of describing the steps required to generate the object, the multi-level schema is used to categorize annotations of the same object based on their level of detail. \autoref{tab:annotation-levels} below shows the defined annotation levels with an example for each level.
 				
 				\begin{table}[H]
 					\centering
@@ -127,14 +127,14 @@
 						
 					\end{tblr}
 					\caption{Proposed Hierarchical Annotation Levels for Parametric Captioning}
-					\label{tab:annotation-level-table}
+					\label{tab:annotation-levels}
 				\end{table}
 				
 			\end{indentedblock}
 					
 		\subsubsection{Annotation Validation using BERTScore and Inter-Rater Reliability}
 			\begin{indentedblock}{4em}{0pt}
-				Since the dataset is comprised of multiple sources, with most lacking the necessary descriptive texts, an additional annotation step is needed. Unlike simple classification, generating natural language descriptions requires high-fidelity textual data that automated processes cannot fully synthesize. To extend the dataset beyond the pre-annotated Text2CAD samples, a \textbf{Human-in-the-Loop (HITL)} annotation pipeline is employed. Unlike simple filtering, this process utilizes \textbf{BERTScore} \parencite{bertscore_zhang} as a semantic validation metric to guide the manual annotation process, ensuring that new descriptions align stylistically with the established Text2CAD annotation schema specified in \autoref{tab:annotation-level-table}.
+				Since the dataset is comprised of multiple sources, with most lacking the necessary descriptive texts, an additional annotation step is needed. Unlike simple classification, generating natural language descriptions requires high-fidelity textual data that automated processes cannot fully synthesize. To extend the dataset beyond the pre-annotated Text2CAD samples, a \textbf{Human-in-the-Loop (HITL)} annotation pipeline is employed. Unlike simple filtering, this process utilizes \textbf{BERTScore} \parencite{bertscore_zhang} as a semantic validation metric to guide the manual annotation process, ensuring that new descriptions align stylistically with the established Text2CAD annotation schema specified in \autoref{tab:annotation-levels}.
 			
 				\skiplines{1}
 			
@@ -155,7 +155,11 @@
 		\begin{indentedblock}{4em}{0pt}
 			The tokenization pipeline consists of four distinct stages designed to ensure geometric invariance and computational efficiency. The overarching goal is to bridge the \textit{semantic gap} between the low-level mathematical definitions of CAD surfaces and the high-level semantic reasoning required by the Transformer. 
 			
+			\skiplines{1}
+			
 			Standard tokenizers face two primary limitations when parsing STEP files. First, they suffer from \textit{semantic fragmentation}, where high-precision floating-point coordinates are split into meaningless sub-word units (e.g., "10.125" becoming "10", ".", "12", "5"), destroying the numerical magnitude required for geometric reasoning \parencite{deepcad_wu}. Second, standard sequential processing fails to capture the \textit{non-local graph topology} inherent in B-Rep data. Spatially adjacent geometric features are often linked only by arbitrary reference IDs (e.g., \#243), creating long-range dependencies that exhaust the finite context window of standard models \parencite{deepcad_wu}. 
+			
+			\skiplines{1}
 			
 			The proposed architecture addresses these limitations by integrating \textbf{Complex-Valued Embeddings} \parencite{trabelsi_2017_deep} and \textbf{Rotary Positional Encodings} \parencite{su_2023_roformer}. This allows the model to inherently encode geometric rotation and magnitude within the latent space, preserving topological fidelity without relying on reconstruction history. \autoref{fig:tokenizer-pipeline} illustrates the architecture.
 			
@@ -169,9 +173,11 @@
 	
 		\subsubsection{Stage 1: Semantic Macro-Compression}
 			\begin{indentedblock}{4em}{0pt}
-				Raw STEP files exhibit extreme verbosity, where semantically simple manufacturing features are explicitly defined by dozens of constituent low-level topological entities. For example, a semantic feature such as a "Through-Hole" is not represented as a single entity, but as a \texttt{CYLINDRICAL\_SURFACE} connected to two \texttt{CIRCLE} edges, which are further linked to multiple \texttt{VERTEX\_POINT} definitions. As noted in foundational generative studies, such excessive sequence length dilutes the attention mechanism's ability to model global structure, often leading to convergence failure on complex assemblies \parencite{deepcad_wu}. Furthermore, flat B-Rep graphs fail to capture the hierarchical nature of mechanical assemblies, necessitating a multi-level graph representation to efficiently encode topological adjacency \parencite{colligan_2022_hierarchical}.
+				Raw STEP files exhibit extreme verbosity, where semantically simple manufacturing features are explicitly defined by dozens of constituent low-level topological entities. For example, a semantic feature such as a "Through-Hole" is not represented as a single entity, but as two \texttt{CIRCLE} edges connected to a \texttt{CYLINDRICAL\_SURFACE}, which are further linked to multiple \texttt{VERTEX\_POINT} definitions. As noted in foundational generative studies, such excessive sequence length dilutes the attention mechanism's ability to model global structure, often leading to convergence failure on complex assemblies \parencite{deepcad_wu}. Furthermore, flat B-Rep graphs fail to capture the hierarchical nature of mechanical assemblies, necessitating a multi-level graph representation to efficiently encode topological adjacency \parencite{colligan_2022_hierarchical}.
 				
-				To mitigate this, a \textbf{Semantic Graph Contraction} algorithm is applied as a pre-tokenization step. A rule-based parser performs subgraph isomorphism checks to identify and compress known topological patterns into smaller, niche tokens. For instance, a \texttt{CYLINDRICAL\_SURFACE} bounded by two \texttt{CIRCLE} edges is fused into a single macro-node \texttt{<CYLINDER\_PRIMITIVE>}. Similarly, adjacent chains of tangential \texttt{B\_SPLINE\_SURFACE} patches are aggregated into \texttt{<FILLET\_CHAIN>} macros. This heuristic reduces the sequence length while retaining the semantic essence of the geometry, effectively increasing the model's receptive field.
+				\skiplines{1}
+				
+				To mitigate this, a \textbf{Semantic Graph Contraction} algorithm is applied as a pre-tokenization step. A rule-based parser performs subgraph isomorphism checks to identify and compress known topological patterns into smaller, niche tokens. For instance, a \texttt{CYLINDRICAL\_SURFACE} bounded by two \texttt{CIRCLE} edges is fused into a single macro-node with identifier \texttt{<CYLINDER\_PRIMITIVE>}. Similarly, adjacent chains of tangential \texttt{B\_SPLINE\_SURFACE} patches are aggregated into \texttt{<FILLET\_CHAIN>} macros. This heuristic reduces the sequence length while retaining the semantic essence of the geometry, effectively increasing the model's receptive field.
 			\end{indentedblock}
 			
 		\subsubsection{Stage 2: Canonical Geometric Normalization}
@@ -196,6 +202,8 @@
 		\subsubsection{Stage 3: Topological Linearization (Canonical DFS)}
 			\begin{indentedblock}{4em}{0pt}
 				Since Transformers utilize positional encoding to interpret sequence order, the serialization of the B-Rep graph must be strictly deterministic. Standard Depth-First Search (DFS) is insufficient because it is sensitive to the stochastic permutation of entity identifiers in the STEP file (e.g., visiting \texttt{\#10=FACE} before \texttt{\#20=FACE} based purely on arbitrary ID assignment). This introduces \textbf{Graph Isomorphism Ambiguity}, where identical geometries produce different sequences, forcing the model to waste capacity learning to ignore these permutations \parencite{deepcad_wu}.
+				
+				\skiplines{1}
 				
 				Resolving this ambiguity requires a \textbf{Canonical DFS} traversal. The algorithm introduces a strict ordering constraint at every branch. For any parent node $N_p$ with child nodes $C = \{c_1, c_2, ..., c_k\}$, the children are sorted based on a geometric invariant function vector $\mathbf{f}(c)$ before traversal:
 				
@@ -292,13 +300,13 @@
 					}
 					Metric & Definition \& Mathematical Formulation & Research Utility \\
 					
-					BLEU-4 
+					BLEU-4 \parencite{bleu_papineni}
 					& \textbf{Focus: Geometric Precision} \newline
 					Quantifies 4-gram precision with uniform weights ($w_n=0.25$) and a Brevity Penalty ($BP$). \newline
 					$ \text{BLEU} = BP \cdot \exp\left( \sum_{n=1}^{4} w_n \log p_n \right) $ 
 					& Enforces \textbf{terminological precision}. It ensures the model correctly predicts specific technical codes (e.g., "ISO 4014") where exact matching is required. \\
 					
-					ROUGE-L 
+					ROUGE-L \parencite{lin_rouge}
 					& \textbf{Focus: Structural Recall} \newline
 					Measures the Longest Common Subsequence (LCS) to evaluate recall and sentence structure. \newline
 					$ R_{lcs} = \frac{LCS(X, Y)}{m} $ 
@@ -321,9 +329,7 @@
 		\end{indentedblock}
 		\subsubsection{Harmonization of Divergent Metrics}
 			\begin{indentedblock}{4em}{0pt}
-				It is recognized in Natural Language Generation (NLG) literature that semantic metrics (BERTScore) and $n$-gram metrics (BLEU) can exhibit an inverse correlation; increasing the "creativity" of a model often improves semantic flow at the cost of exact word matching. To resolve this tension and ensure robust evaluation, this research implements a \textbf{Hierarchical Metric Prioritization} strategy that aligns specific metrics with the annotation levels defined in \autoref{tab:annotation_levels}.
-				
-				The conflict is resolved by dynamically shifting the weight of the evaluation metric based on the target granularity:
+				It is recognized in Natural Language Generation (NLG) literature that semantic metrics (BERTScore) and $n$-gram metrics (BLEU) can exhibit an inverse correlation; increasing the "creativity" of a model often improves semantic flow at the cost of exact word matching. To resolve this tension and ensure robust evaluation, this research implements a \textbf{Hierarchical Metric Prioritization} strategy that aligns specific metrics with the annotation levels defined in \autoref{tab:annotation-levels} as defined below:
 				
 				\begin{itemize}
 					\item \textbf{Level 1 (Functional Category): Prioritizing BERTScore.} \\
