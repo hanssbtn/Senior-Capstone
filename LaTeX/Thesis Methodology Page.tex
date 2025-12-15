@@ -37,14 +37,14 @@
 					}
 					\textbf{Source} & \textbf{Type} & \textbf{Summary} & \textbf{Advantages} & \textbf{Disadvantages} \\
 					
-					TraceParts & Online Library & Mfr-verified standard parts (bolts, gears, bearings). & High-fidelity geometry; ISO/DIN compliant. & Limited to standard hardware; requires scraping. \\
+					TraceParts & Online Library & MFR-verified standard parts (bolts, gears, bearings). & High-fidelity geometry; ISO/DIN compliant. & Limited to standard hardware; requires scraping. \\
 					
 					GrabCAD & Online Library & 6M+ user files & High diversity of complex/creative designs. & Inconsistent quality; non-manifold geometry. \\ 
 					
 					Text2CAD & Dataset & Annotated CAD files with text-geometry pairs. & Ready-to-use labels; strictly organized. & Lower complexity than industry files. \\
 					
 					Fusion 360 & Dataset & Designs exported with assembly timelines. & Includes reconstruction history (timelines). & Proprietary format; inconsistent exports. \\
-					ABC & Dataset & 1M+ unlabelled B-Rep files from Onshape. & Massive scale; robust topology for pre-training. & No semantic labels; contains "garbage" data. \\
+					ABC dataset & Dataset & 1M+ unlabelled B-Rep files from Onshape. & Massive scale; robust topology for pre-training. & No semantic labels; contains "garbage" data. \\
 					
 				\end{tblr}
 				\caption{Comparison of CAD Dataset Sources.}
@@ -258,9 +258,17 @@
 			\begin{indentedblock}{4em}{0pt}
 				To preserve geometric fidelity within the pre-trained blocks, the \textbf{Rotary Positional Embedding (RoPE)} mechanism \parencite{su_2023_roformer} is modified and inserted into the attention layers. The phase angle $\theta$ from the complex geometric stream is used to rotate the Query ($Q$) and Key ($K$) vectors in the attention calculation:
 				\begin{equation}
-					\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{(R_{\theta_i}Q)(R_{\theta_j}K)^T}{\sqrt{d_k}}\right)V
+					\text{Attention-RoPE}(Q, K, V) = \text{softmax}\left(\frac{(R_{\theta_i}Q)(R_{\theta_j}K)^T}{\sqrt{d_k}}\right)V
 				\end{equation}
 				Where $R_{\theta}$ represents the rotation matrix derived from the tokenizer's complex input. This ensures that attention scores reflect not just semantic compatibility, but physical alignment. For example, a \texttt{SCREW} entity will attend strongly to a \texttt{HOLE} entity only if their orientation vectors (Normal vectors) are aligned (i.e., the relative rotation $\Delta\theta \approx 0$), thereby embedding physical assembly logic directly into the attention weights.
+				
+				\skiplines{1}
+				
+				It is important to distinguish the role of Stage 2 (Canonical Normalization) from Stage 4 (RoPE). While Canonical Normalization standardizes the \textit{global pose} of the assembly to achieve rotational invariance (ensuring the input is not dependent on the camera angle), it does not explicitly model the \textit{internal topology} of the B-Rep graph.
+				
+				\skiplines{1}
+				
+				Consider a complex mechanical assembly consists of multiple sub-structures (e.g., orthogonal bosses, angled chamfers, intersecting bores) defined by their relative angular offsets. RoPE is utilized  to encode \textbf{Local Covariance}: it allows the attention mechanism to measure the relative orientation ($\Delta \theta$) between any two topological entities $i$ and $j$. This enables the model to distinguish distinct morphological classes based purely on internal angular relationships, such as distinguishing a $90^\circ$ "Elbow Fitting" from a $45^\circ$ variant, even after both have been globally aligned to the canonical $z$-axis.
 			\end{indentedblock}
 	
 \section{Training and Evaluation}
@@ -281,7 +289,7 @@
 	
 	\subsection{Evaluation Metrics}
 		\begin{indentedblock}{4em}{0pt}
-			Since the output is an open-ended natural language sequence, standard accuracy metrics are insufficient. This study employs a suite of semantic similarity metrics to evaluate the generated annotations' quality against the ground truth as specified in \autoref{tab:evaluation-metrics}
+			Since the output is an open-ended natural language sequence, standard accuracy metrics are insufficient. This study employs a suite of semantic similarity metrics to evaluate the generated annotations' quality against the ground truth as specified in \autoref{tab:evaluation-metrics}.
 			
 			\begin{table}[H]
 				\centering
