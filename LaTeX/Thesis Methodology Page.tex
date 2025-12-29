@@ -39,7 +39,7 @@
 					
 					TraceParts & Online Library & MFR-verified standard parts (bolts, gears, bearings). & High-fidelity geometry; ISO/DIN compliant. & Limited to standard hardware; requires scraping. \\
 					
-					GrabCAD & Online Library & 6M+ user files & High diversity of complex/creative designs. & Inconsistent quality; non-manifold geometry. \\ 
+					GrabCAD & Online Library & 6M+ user files & High diversity of complex/creative user-made designs. & Inconsistent quality; non-manifold geometry. \\ 
 					
 					Text2CAD & Dataset & Annotated CAD files with text-geometry pairs. & Ready-to-use labels; strictly organized. & Lower complexity than industry files. \\
 					
@@ -59,6 +59,8 @@
 		\subsubsection{Dataset Filtering}
 			\begin{indentedblock}{4em}{0pt}
 				Before training, the dataset undergoes a rigorous analysis to eliminate rare or low-quality CAD designs that could destabilize the model. The filtering process is divided into two distinct stages. The first stage is \textbf{Class and Format Standardization}, implemented using PythonOCC. The script scans the raw data to enforce domain relevance by discarding any files not listed in the target object whitelist (e.g., excluding rare CAD designs and broken/corrupted files). Valid JSON-based CAD files are then automatically converted to STEP format using the OpenCascade library, while other unrecognizable formats are purged from the dataset.
+				
+				\skiplines{1}
 				
 				The next stage focuses on \textbf{Manifold Validation}. Since raw STEP files frequently contain disjointed surfaces or unstitched faces, a "water-tight" topological check is enforced, Using volumetric analysis (Volume $> 0$), any file containing open shells or non-manifold geometry is explicitly discarded. This initial geometric sanitation prevents invalid outliers from polluting the training signal, ensuring that the model only learns from physically realizable 3D objects.
 				
@@ -133,6 +135,7 @@
 			\end{indentedblock}
 					
 		\subsubsection{Annotation Validation using BERTScore and Inter-Rater Reliability}
+			\label{sec:irr}
 			\begin{indentedblock}{4em}{0pt}
 				Since the dataset is comprised of multiple sources, with most lacking the necessary descriptive texts, an additional annotation step is needed. Unlike simple classification, generating natural language descriptions requires high-fidelity textual data that automated processes cannot fully synthesize. To extend the dataset beyond the pre-annotated Text2CAD samples, a \textbf{Human-in-the-Loop (HITL)} annotation pipeline is employed. Unlike simple filtering, this process utilizes \textbf{BERTScore} \parencite{bertscore_zhang} as a semantic validation metric to guide the manual annotation process, ensuring that new descriptions align stylistically with the established Text2CAD annotation schema specified in \autoref{tab:annotation-levels}.
 			
@@ -288,53 +291,57 @@
 		\end{indentedblock}
 	
 	\subsection{Evaluation Metrics}
-		\begin{indentedblock}{4em}{0pt}
-			Since the output is an open-ended natural language sequence, standard accuracy metrics are insufficient. This study employs a suite of semantic similarity metrics to evaluate the generated annotations' quality against the ground truth as specified in \autoref{tab:evaluation-metrics}.
-			
-			\begin{table}[H]
-				\centering
-				\small % Slightly smaller text to fit the math comfortably
-				\begin{tblr}{
-						width=\linewidth,
-						colspec={
-							Q[l,m,0.15\linewidth]  % Metric Name: Fixed narrow width
-							X[1.6,l,m]             % Definition: Wider for math
-							X[1.2,l,m]             % Utility: Moderate width
-						},
-						hlines,
-						vlines,
-						row{1}={font=\bfseries, halign=c, valign=m, bg=gray9}, % Header styling
-						cell{2-5}{1}={font=\bfseries} % Bold the Metric names
-					}
-					Metric & Definition \& Mathematical Formulation & Research Utility \\
-					
-					BLEU-4 \parencite{bleu_papineni}
-					& \textbf{Focus: Geometric Precision} \newline
-					Quantifies 4-gram precision with uniform weights ($w_n=0.25$) and a Brevity Penalty ($BP$). \newline
-					$ \text{BLEU} = BP \cdot \exp\left( \sum_{n=1}^{4} w_n \log p_n \right) $ 
-					& Enforces \textbf{terminological precision}. It ensures the model correctly predicts specific technical codes (e.g., "ISO 4014") where exact matching is required. \\
-					
-					ROUGE-L \parencite{lin_rouge}
-					& \textbf{Focus: Structural Recall} \newline
-					Measures the Longest Common Subsequence (LCS) to evaluate recall and sentence structure. \newline
-					$ R_{lcs} = \frac{LCS(X, Y)}{m} $ 
-					& Rewards the correct \textbf{syntactic flow} of the engineering description, ensuring the model generates complete sentence structures rather than disjointed keywords. \\
-					
-					BERTScore \parencite{bertscore_zhang}
-					& \textbf{Focus: Semantic Similarity} \newline
-					Uses a pre-trained BERT model to compare embedding-level overlap between candidate and reference. Unlike $n$-grams (e.g. BLEU), it operates in latent space.
-					& Serves as the primary metric for capturing \textbf{meaning} and context (e.g., recognizing that "fastener" and "bolt" are semantically related). \\
-					
-					Human Verification (IRR)
-					& \textbf{Focus: Hallucination Rate} \newline
-					A manual review process where human experts verify a subset of generations against the 3D geometry.
-					& Identifies \textbf{hallucinations}—instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent. \\
-					
-				\end{tblr}
-				\caption{Summary of Evaluation Metrics for Geometric Captioning}
-				\label{tab:evaluation-metrics}
-			\end{table}
-		\end{indentedblock}
+		\subsubsection{Metric Definition and Evaluation Thresholds}
+			\begin{indentedblock}{4em}{0pt}
+				Since the output is an open-ended natural language sequence, standard accuracy metrics are insufficient. This study employs a suite of semantic similarity metrics to evaluate the generated annotations' quality against the ground truth as specified in \autoref{tab:evaluation-metrics}.
+				
+				\begin{table}[H]
+					\centering
+					\small % Slightly smaller text to fit the math comfortably
+					\begin{tblr}{
+							width=\linewidth,
+							colspec={
+								Q[l,m,0.15\linewidth]  % Metric Name: Fixed narrow width
+								X[1.6,l,m]             % Definition: Wider for math
+								X[1.2,l,m]             % Utility: Moderate width
+							},
+							hlines,
+							vlines,
+							row{1}={font=\bfseries, halign=c, valign=m, bg=gray9}, % Header styling
+							cell{2-5}{1}={font=\bfseries} % Bold the Metric names
+						}
+						Metric & Definition \& Mathematical Formulation & Research Utility \\
+						
+						BLEU-4 \parencite{bleu_papineni}
+						& \textbf{Focus: Geometric Precision} \newline
+						Quantifies 4-gram precision with uniform weights ($w_n=0.25$) and a Brevity Penalty ($BP$). \newline
+						$ \text{BLEU} = BP \cdot \exp\left( \sum_{n=1}^{4} w_n \log p_n \right) $ 
+						& Enforces \textbf{terminological precision}. It ensures the model correctly predicts specific technical codes (e.g., "ISO 4014") where exact matching is required. \\
+						
+						ROUGE-L \parencite{lin_rouge}
+						& \textbf{Focus: Structural Recall} \newline
+						Measures the Longest Common Subsequence (LCS) to evaluate recall and sentence structure. \newline
+						$ R_{lcs} = \frac{LCS(X, Y)}{m} $ 
+						& Rewards the correct \textbf{syntactic flow} of the engineering description, ensuring the model generates complete sentence structures rather than disjointed keywords. \\
+						
+						BERTScore \parencite{bertscore_zhang}
+						& \textbf{Focus: Semantic Similarity} \newline
+						Uses a pre-trained BERT model to compare embedding-level overlap between candidate and reference. Unlike $n$-grams (e.g. BLEU), it operates in latent space.
+						& Serves as the primary metric for capturing \textbf{meaning} and context (e.g., recognizing that "fastener" and "bolt" are semantically related). \\
+						
+						Human Verification (IRR)
+						& \textbf{Focus: Hallucination Rate} \newline
+						A manual review process where human experts verify a subset of generations against the 3D geometry.
+						& Identifies \textbf{hallucinations}—instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent. \\
+						
+					\end{tblr}
+					\caption{Summary of Evaluation Metrics for Geometric Captioning}
+					\label{tab:evaluation-metrics}
+				\end{table}
+				
+				For each of the quantitative metrics listed in \autoref{tab:evaluation-metrics}, a minimum threshold is determined as a way to measure the quality of the model's results. For instance, the model ideally results in a BLEU-4 score $> 0.4$ to closely match Human-to-Human results \parencite{wu_google_translate}. The minimum threshold for ROUGE-L is set to be $> 0.35$ to ensure the model does not omit necessary details of the model from the annotation \parencite{lin_rouge}. A BERTScore threshold of $> 0.85$ is ideal for annotation since it measures the similarity in meaning between 2 sentences \parencite{bertscore_zhang}. Lastly, human verification will be measured using Cohen's $\kappa$ as stated in Section \ref{sec:irr} \parencite{kappa_landis}. 
+				
+			\end{indentedblock}
 		\subsubsection{Harmonization of Divergent Metrics}
 			\begin{indentedblock}{4em}{0pt}
 				It is recognized in Natural Language Generation (NLG) literature that semantic metrics (BERTScore) and $n$-gram metrics (BLEU) can exhibit an inverse correlation; increasing the "creativity" of a model often improves semantic flow at the cost of exact word matching. To resolve this tension and ensure robust evaluation, this research implements a \textbf{Hierarchical Metric Prioritization} strategy that aligns specific metrics with the annotation levels defined in \autoref{tab:annotation-levels} as defined below:
@@ -349,5 +356,4 @@
 				
 				By treating the metrics as complementary filters rather than competing objectives, the model can distinguish between \textit{benign stylistic variations} (penalized by BLEU but accepted by BERTScore) and \textit{critical engineering errors} (penalized by both).
 			\end{indentedblock}
-
 \endgroup
