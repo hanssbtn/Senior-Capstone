@@ -53,6 +53,42 @@
 \makeatother
 % ----------------------------------------------------------------------------------
 
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
+\counterwithout{equation}{chapter}
+
+\renewcommand{\listfigurename}{\hfill\bfseries\fontsize{14pt}{1.25\baselineskip}\selectfont LIST OF FIGURES\hfill}
+\renewcommand{\cftfigindent}{0pt}
+% 2. Add "Figure " prefix
+\renewcommand{\cftfigpresnum}{Figure }
+\settowidth{\cftfignumwidth}{Figure 000} % Adjust width to fit the prefix
+
+% 3. REMOVE DOTS: Replace dotfill with a simple horizontal fill
+\renewcommand{\cftfigleader}{\hfill}
+
+% 4. Adjust page number alignment (optional, ensures they stay right-aligned)
+\renewcommand{\cftfigafterpnum}{\par}
+
+\renewcommand{\listtablename}{\hfill\bfseries\fontsize{14pt}{1.25\baselineskip}\selectfont LIST OF TABLES\hfill}
+\renewcommand{\cfttabindent}{0pt}
+\renewcommand{\cfttabpresnum}{Table }
+\settowidth{\cfttabnumwidth}{Table 000} % Adjust width to fit the prefix
+
+\renewcommand{\cfttableader}{\hfill}
+
+\newlistof{formulas}{eqs}{\hfill\bfseries\fontsize{14pt}{1.25\baselineskip}\selectfont LIST OF FORMULAS\hfill}
+%
+\setlength{\cftformulasindent}{0pt}
+\renewcommand{\cftformulaspresnum}{(}
+\renewcommand{\cftformulasaftersnum}{)}
+\settowidth{\cftformulasnumwidth}{(999) } 
+\renewcommand{\cftformulasleader}{\hfill}
+\renewcommand{\cftformulasafterpnum}{\par}
+
+\newcommand{\addformula}[1]{%
+	\addcontentsline{eqs}{formulas}{\protect\numberline{\theequation}#1}%
+}
+
 \begingroup
 	\makeatletter
 	% Hack to make the dots meet the titles
@@ -64,15 +100,15 @@
 			\textbf{CHAPTER #1}%
 		}%
 	}%
-	\renewcommand{\listtablename}{\hfill\bfseries\fontsize{14pt}{1.25\baselineskip}\selectfont LIST OF TABLES\hfill}
-	\renewcommand{\listfigurename}{\hfill\bfseries\fontsize{14pt}{1.25\baselineskip}\selectfont LIST OF FIGURES\hfill}
 	
 	\makeatother
 	\tableofcontents
 	\pagebreak
-	\listoffigures
-	\pagebreak
-	\listoftables
-	\pagebreak
-
 \endgroup
+
+\listoffigures
+\pagebreak
+\listoftables
+\pagebreak
+\listofformulas
+\pagebreak

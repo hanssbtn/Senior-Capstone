@@ -8,7 +8,7 @@
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.6\linewidth]{"../Images/DATASET ACQUISITION AND FILTERING FLOWCHART"}
-		\caption{Dataset acquisition and filtering flowchart.}
+		\caption{Dataset acquisition and filtering flowchart}
 		\label{fig:dataset-acquisition-and-filtering-flowchart}
 	\end{figure}
 	
@@ -169,8 +169,8 @@
 			
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\linewidth]{../Images/TikZ/TOKENIZER.pdf}
-				\caption{The proposed four-stage tokenization pipeline.}
+				\includegraphics[width=\linewidth]{../Images/TikZ/TOKENIZER.pdf}
+				\caption{The proposed four-stage tokenization pipeline}
 				\label{fig:tokenizer-pipeline}
 			\end{figure}
 		\end{indentedblock}
@@ -191,11 +191,14 @@
 					\item \textbf{Centroid Subtraction (Translation Invariance):} The geometric center of mass $\mu$ is computed across all control points $P = \{p_1, p_2, ..., p_N\}$. All vertices are translated such that the centroid aligns with the global origin:
 					\begin{equation}
 						p'_i = p_i - \frac{1}{N}\sum_{j=1}^{N} p_j
+						\addformula{Centroid Transformation}
 					\end{equation}
+
 					
 					\item \textbf{PCA Alignment (Rotation Invariance):} To align the geometry with a consistent canonical orientation, Principal Component Analysis (PCA) is performed on the vertex cloud \parencite{alignment_chaouch}. Then the covariance matrix $\Sigma$ is computed:
 					\begin{equation}
 						\Sigma = \frac{1}{N} \sum_{i=1}^{N} p'_i (p'_i)^T
+						\addformula{PCA Alignment}
 					\end{equation}
 					The eigenvectors $v_1, v_2, v_3$ of $\Sigma$ represent the primary, secondary, and tertiary axes of variance. The geometry is rotated via matrix $R = [v_1, v_2, v_3]$ such that the axis of greatest variance (e.g., the length of a screw) aligns with the global $z$-axis.
 					
