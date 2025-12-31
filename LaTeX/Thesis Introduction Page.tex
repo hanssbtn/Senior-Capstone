@@ -31,7 +31,7 @@
 			
 			\skiplines{1}
 		
-			Although the use of CAD have improved the overall design and manufacturing process, they also pose their own set of issues. For example, CAD software developers often employ their own proprietary file formats, each with their own complex structures. This results in major incompatibility issues as users might have different tooling preferences. As a result, international governing bodies such as International Organization for Standardization (ISO) have developed universal CAD file formats such as STEP to handle the issue of compatibility. A STEP file consists of components that each describe geometric data using a language called EXPRESS \parencite{step_iso_pratt}. Another universal CAD file format include STL designed by 3D Systems in 1987, which contains a set of triangles consisting of facets and vertices \parencite{stl_nagy}.
+			Although the use of CAD have improved the overall design and manufacturing process, they also pose their own set of issues. For example, CAD software developers often employ their own proprietary file formats, each with their own complex structures. This results in major incompatibility issues as users might have different tooling preferences. As a result, international governing bodies such as International Organization for Standardization (ISO) have developed universal CAD file formats such as Standard for the Exchange of Product Data (STEP) to handle the issue of compatibility. A STEP file consists of components that each describe geometric data using a language called EXPRESS \parencite{step_iso_pratt}. Another universal CAD file format include STL designed by 3D Systems in 1987, which contains a set of triangles consisting of facets and vertices \parencite{stl_nagy}.
 			
 			\skiplines{1}
 			
@@ -58,13 +58,10 @@
 			Develop a Transformer-based system capable of generating high-fidelity functional descriptions for unlabelled STEP files, validated against human-authored ground truth using BERTScore.
 		}
 		\item {
-			Translating low-level B-Rep topology (e.g., NURBS curves, closed shells) into high-level semantic concepts (e.g., "Hexagonal Head", "Threaded Shaft") with $>80\%$ identification accuracy.
+			Translating low-level B-Rep topology into high-level semantic concepts with $>80\%$ identification accuracy as measured with BERTScore and BLEU measures.
 		}
 		\item {
 			Enhance CAD file indexing by leveraging model-generated descriptions as semantic metadata.
-		}
-		\item {
-			Enable low latency inference using a Hierarchical Dual-Stream Tokenizer architecture. (At least < 1s inference time for any given input model).
 		}
 	\end{enumerate}
 	

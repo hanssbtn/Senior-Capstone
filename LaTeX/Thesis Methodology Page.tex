@@ -80,7 +80,8 @@
 				
 				\skiplines{1}
 				
-				Data sourced from TraceParts often contains descriptive but non-standardized filenames (e.g., \textit{"Hexagon\_Head\_Screw\_ISO4017\_M8.stp"}). To extract the functional class, a \textbf{Hierarchical Regex Parser} is employed. The parser utilizes a dictionary of domain-specific keywords to map CAD files into general, high-level categories to ensure accurate annotation. The mapping logic follows a precedence order specified below to resolve ambiguities:
+				Data sourced from TraceParts often contains descriptive but non-stand\\
+				-ardized filenames (e.g., \textit{"Hexagon\_Head\_Screw\_ISO4017\_M8.stp"}). To extract the functional class, a \textbf{Hierarchical Regex Parser} is employed. The parser utilizes a dictionary of domain-specific keywords to map CAD files into general, high-level categories to ensure accurate annotation. The mapping logic follows a precedence order specified below to resolve ambiguities:
 				
 				\skiplines{1}
 				
@@ -222,7 +223,7 @@
 				\end{itemize}
 				
 				\paragraph{Handling Symmetries:}
-				In cases of perfect symmetry (e.g., a Cube where all faces have identical Area and Distance), a deterministic fallback utilizes the principal axis alignment from Stage 2: faces are sorted by their centroid's $Z, Y, X$ coordinates. This guarantees that a specific 3D geometry yields an \textit{identical} token sequence regardless of the raw file's ID permutation \parencite{colligan_2022_hierarchical}.
+				In cases of perfect symmetry (e.g., a Cube where all faces have identical Area and Distance), a deterministic fallback utilizes the principal axis alignment from Stage 2: faces are sorted by their centroid's $Z, Y, X$ coordinates. This guarantees that a specific 3D geometry yields an identical token sequence regardless of the raw file's ID permutation \parencite{colligan_2022_hierarchical}.
 			\end{indentedblock}
 		
 		\subsubsection{Stage 4: Complex-Valued Dual-Stream Encoding}
@@ -263,7 +264,7 @@
 				\begin{equation}
 					\text{Attention-RoPE}(Q, K, V) = \text{softmax}\left(\frac{(R_{\theta_i}Q)(R_{\theta_j}K)^T}{\sqrt{d_k}}\right)V
 				\end{equation}
-				Where $R_{\theta}$ represents the rotation matrix derived from the tokenizer's complex input. This ensures that attention scores reflect not just semantic compatibility, but physical alignment. For example, a \texttt{SCREW} entity will attend strongly to a \texttt{HOLE} entity only if their orientation vectors (Normal vectors) are aligned (i.e., the relative rotation $\Delta\theta \approx 0$), thereby embedding physical assembly logic directly into the attention weights.
+				where $R_{\theta}$ represents the rotation matrix derived from the tokenizer's complex input. This ensures that attention scores reflect not just semantic compatibility, but physical alignment. For example, a \texttt{SCREW} entity will attend strongly to a \texttt{HOLE} entity only if their orientation vectors (Normal vectors) are aligned (i.e., the relative rotation $\Delta\theta \approx 0$), thereby embedding physical assembly logic directly into the attention weights.
 				
 				\skiplines{1}
 				
