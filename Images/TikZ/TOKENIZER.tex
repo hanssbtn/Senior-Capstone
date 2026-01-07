@@ -1,5 +1,6 @@
 \documentclass[tikz,border=10pt]{standalone}
 \usepackage{tikz}
+\usepackage{svg}
 \usepackage{amssymb}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, fit, backgrounds, shadows}
 
@@ -148,14 +149,17 @@
 		\draw[line] (stage3.east) -- node[above, font=\small\bfseries, color=gray, text width=2.5cm, align=center] {Token Sequence} (stage4.west |- stage4_center);
 		
 		% 4. Final Output Arrow (Coming out of Stage 4)
-		\node[right=1.5cm of stage4, font=\bfseries\large, align=center, color=gray!80!black] (output_label) {Final\\Tensor};
+		\node[right=1.5cm of stage4, font=\bfseries\large, align=center, color=gray!80!black] (output_label) {\includegraphics[width=2cm]{stacks_60dp_FFD41D_FILL0_wght400_GRAD0_opsz48.png}};
+		\node[minimum  size=2.25cm, right=1.5cm of stage4, font=\bfseries\large, align=center, color=gray!80!black] (output_label) {Final\\Tensor};
 		\draw[line] (stage4.east) -- (output_label.west);
 		
 		
 		% =========================================================
 		% INPUT LABEL
 		% =========================================================
+		\node[left=1.5cm of stage1, font=\bfseries\large, align=center, color=gray!80!black] (input_label) {\includegraphics[width=2cm]{../TikZ/file_present_60dp_FFD41D_FILL0_wght400_GRAD0_opsz48.png}};
 		\node[left=1.5cm of stage1, font=\bfseries\large, align=center, color=gray!80!black] (input_label) {Raw\\STEP File};
+		
 		\draw[line] (input_label.east) -- (stage1.west);
 		
 		\path (stage1.north) ++(0, 1cm) coordinate (point);

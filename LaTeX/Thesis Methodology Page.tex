@@ -4,13 +4,7 @@
 \begingroup
 \fontsize{12pt}{\baselineskip}\selectfont
 \section{Data Gathering}
-	Training a descriptive model effectively necessitates a large-scale, high-fidelity dataset that pairs geometric representations with semantic natural language. However, unlike 2D image-captioning domains, the 3D CAD landscape suffers from a significant scarcity of standardized, human-readable annotations. To address this sparsity, a comprehensive acquisition framework was developed to ingest raw geometric data, filter for quality, and semantically enrich samples through a hybrid HITL process. A summary of the dataset preprocessing steps can be seen in \autoref{fig:dataset-acquisition-and-filtering-flowchart} below.
-	\begin{figure}[H]
-		\centering
-		\includegraphics[width=0.6\linewidth]{"../Images/DATASET ACQUISITION AND FILTERING FLOWCHART"}
-		\caption{Dataset acquisition and filtering flowchart}
-		\label{fig:dataset-acquisition-and-filtering-flowchart}
-	\end{figure}
+	Training a descriptive model effectively necessitates a large-scale, high-fidelity dataset that pairs geometric representations with semantic natural language. However, unlike 2D image-captioning domains, the 3D CAD landscape suffers from a significant scarcity of standardized, human-readable annotations. To address this sparsity, a comprehensive acquisition framework was developed to ingest raw geometric data, filter for quality, and semantically enrich samples through a hybrid HITL process. A summary of the dataset preprocessing steps can be seen in \autoref{fig:dataset-acquisition-and-filtering-flowchart}.
 	
 	\subsection{Dataset Source Selection}
 		\begin{indentedblock}{4em}{0pt}
@@ -20,7 +14,8 @@
 			
 			\begin{table}[H]
 				\centering
-				\footnotesize % significantly reduces font size to save vertical space
+				\caption{Comparison of CAD Dataset Sources.}
+				\small
 				\begin{tblr}{
 						width=\linewidth, % Forces table to be as wide as the page
 						colspec={
@@ -47,7 +42,6 @@
 					ABC dataset & Dataset & 1M+ unlabelled B-Rep files from Onshape. & Massive scale; robust topology for pre-training. & No semantic labels; contains "garbage" data. \\
 					
 				\end{tblr}
-				\caption{Comparison of CAD Dataset Sources.}
 				\label{tab:dataset-comparison-table}
 			\end{table} 
 			
@@ -97,6 +91,7 @@
 				
 				\begin{table}[H]
 					\centering
+					\caption{Proposed Hierarchical Annotation Levels for Parametric Captioning}
 					\footnotesize % Reduces font size to save vertical space
 					\begin{tblr}{
 							width=\linewidth, % Forces table to use full page width
@@ -129,7 +124,6 @@
 						& "An \textbf{ISO 4014 Hex Bolt} with a nominal thread diameter of \textbf{8mm} (M8), a total shaft length of \textbf{40mm}, and a thread pitch of 1.25mm." \\
 						
 					\end{tblr}
-					\caption{Proposed Hierarchical Annotation Levels for Parametric Captioning}
 					\label{tab:annotation-levels}
 				\end{table}
 				
@@ -149,6 +143,12 @@
 				To validate the quality of the human-generated descriptions, a blind cross-verification study was conducted. A senior domain expert will be assigned to review a random sample of $N=500$ annotated descriptions, rating them as either "Compliant" or "Non-Compliant" based on the style guide. The consistency of this quality control process was measured using \textbf{Inter-Rater Reliability (IRR)}, specifically \textbf{Cohen's Kappa ($\kappa$)} \parencite{kappa_cohen}. This metric was chosen over simple percent agreement to robustly account for the possibility of chance agreement, with a target threshold of $\kappa > 0.80$ established to certify the dataset's reliability for training the transformer model \parencite{kappa_landis}.
 			\end{indentedblock}
 			
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=1.2\linewidth, pagecenter]{"../Images/DATASET ACQUISITION AND FILTERING FLOWCHART"}
+		\caption{Dataset acquisition and filtering flowchart}
+		\label{fig:dataset-acquisition-and-filtering-flowchart}
+	\end{figure}
 % --- SECTION 3.2 ---
 \section{Model Design}
 	\label{sec:model-design}
@@ -168,8 +168,8 @@
 			The proposed architecture addresses these limitations by integrating \textbf{Complex-Valued Embeddings} \parencite{trabelsi_2017_deep} and \textbf{Rotary Positional Encodings} \parencite{su_2023_roformer}. This allows the model to inherently encode geometric rotation and magnitude within the latent space, preserving topological fidelity without relying on reconstruction history. \autoref{fig:tokenizer-pipeline} illustrates the architecture.
 			
 			\begin{figure}[H]
-				\centering
-				\includegraphics[width=\linewidth]{../Images/TikZ/TOKENIZER.pdf}
+				\includegraphics[width=1.2\linewidth, pagecenter]{../Images/TikZ/TOKENIZER.pdf}%
+				
 				\caption{The proposed four-stage tokenization pipeline}
 				\label{fig:tokenizer-pipeline}
 			\end{figure}
@@ -181,7 +181,7 @@
 				
 				\skiplines{1}
 				
-				To mitigate this, a \textbf{Semantic Graph Contraction} algorithm is applied as a pre-tokenization step. A rule-based parser performs subgraph isomorphism checks to identify and compress known topological patterns into smaller, niche tokens. For instance, a \texttt{CYLINDRICAL\_SURFACE} bounded by two \texttt{CIRCLE} edges is fused into a single macro-node with identifier \texttt{<CYLINDER\_PRIMITIVE>}. Similarly, adjacent chains of tangential \texttt{B\_SPLINE\_SURFACE} patches are aggregated into \texttt{<FILLET\_CHAIN>} macros. This heuristic reduces the sequence length while retaining the semantic essence of the geometry, effectively increasing the model's receptive field.
+				Mitigating this issue necessitates a \textbf{Semantic Graph Contraction} algorithm to be applied as a pre-tokenization step. A rule-based parser performs subgraph isomorphism checks to identify and compress known topological patterns into smaller, niche tokens. One example of this is a \texttt{CYLINDRICAL\_SURFACE} bounded by two \texttt{CIRCLE} edges is fused into a single macro-node with identifier \texttt{<CYLINDER\_PRIMITIVE>}. Similarly, adjacent chains of tangential \texttt{B\_SPLINE\_SURFACE} patches are aggregated into \texttt{<FILLET\_CHAIN>} macros. This heuristic reduces the sequence length while retaining the semantic essence of the geometry, effectively increasing the model's receptive field.
 			\end{indentedblock}
 			
 		\subsubsection{Stage 2: Canonical Geometric Normalization}
@@ -286,8 +286,8 @@
 				\mathcal{L}_{CLM} = - \sum_{t=1}^{T} \log P(w_t | w_{<t}, G; \Theta)
 			\end{equation}
 			
-			\textbf{Instruction Tuning Format:}
-			To structure the generation, the input is formatted as a prompt-response pair:
+			
+			To ensure the coherence of the generated output, the input is formatted as a prompt-response pair with the resulting structure.
 			\begin{equation}
 				\texttt{[GEO\_START] } G_{tokens} \texttt{ [GEO\_END] [DESCRIBE] } \rightarrow \text{Target Caption}
 			\end{equation}
@@ -301,7 +301,8 @@
 				
 				\begin{table}[H]
 					\centering
-					\small % Slightly smaller text to fit the math comfortably
+					\caption{Summary of Evaluation Metrics for Geometric Captioning}
+					\small
 					\begin{tblr}{
 							width=\linewidth,
 							colspec={
@@ -339,7 +340,6 @@
 						& Identifies \textbf{hallucinations}—instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent. \\
 						
 					\end{tblr}
-					\caption{Summary of Evaluation Metrics for Geometric Captioning}
 					\label{tab:evaluation-metrics}
 				\end{table}
 				
@@ -348,7 +348,7 @@
 			\end{indentedblock}
 		\subsubsection{Harmonization of Divergent Metrics}
 			\begin{indentedblock}{4em}{0pt}
-				It is recognized in Natural Language Generation (NLG) literature that semantic metrics (BERTScore) and $n$-gram metrics (BLEU) can exhibit an inverse correlation; increasing the "creativity" of a model often improves semantic flow at the cost of exact word matching. To resolve this tension and ensure robust evaluation, this research implements a \textbf{Hierarchical Metric Prioritization} strategy that aligns specific metrics with the annotation levels defined in \autoref{tab:annotation-levels} as defined below:
+				It is recognized in Natural Language Generation (NLG) literature that semantic metrics (BERTScore) and $n$-gram metrics (BLEU) can exhibit an inverse correlation; increasing the "creativity" of a model often improves semantic flow at the cost of exact word matching. Resolving this tension and ensure robust evaluation requires an implementation of a \textbf{Hierarchical Metric Prioritization} strategy that aligns specific metrics with the annotation levels defined in \autoref{tab:annotation-levels} as defined below:
 				
 				\begin{itemize}
 					\item \textbf{Level 1 (Functional Category): Prioritizing BERTScore.} \\
