@@ -97,7 +97,7 @@
 							width=\linewidth, % Forces table to use full page width
 							colspec={
 								Q[l,m,1.6cm]   % Level: Fixed, narrow
-								X[1.25,l,m]     % Scope: Flexible, narrow-medium
+								X[1.5,l,m]     % Scope: Flexible, narrow-medium
 								X[2.2,l,m]     % Definition: Flexible, medium
 								X[3.5,l,m]     % Example: Flexible, widest
 							},
@@ -130,7 +130,6 @@
 			\end{indentedblock}
 					
 		\subsubsection{Annotation Validation using BERTScore and Inter-Rater Reliability}
-			\label{sec:irr}
 			\begin{indentedblock}{4em}{0pt}
 				Since the dataset is comprised of multiple sources, with most lacking the necessary descriptive texts, an additional annotation step is needed. Unlike simple classification, generating natural language descriptions requires high-fidelity textual data that automated processes cannot fully synthesize. To extend the dataset beyond the pre-annotated Text2CAD samples, a \textbf{Human-in-the-Loop (HITL)} annotation pipeline is employed. Unlike simple filtering, this process utilizes \textbf{BERTScore} \parencite{bertscore_zhang} as a semantic validation metric to guide the manual annotation process, ensuring that new descriptions align stylistically with the established Text2CAD annotation schema specified in \autoref{tab:annotation-levels}.
 			
@@ -140,7 +139,7 @@
 				
 				\skiplines{1}
 				
-				To validate the quality of the human-generated descriptions, a blind cross-verification study was conducted. A senior domain expert will be assigned to review a random sample of $N=500$ annotated descriptions, rating them as either "Compliant" or "Non-Compliant" based on the style guide. The consistency of this quality control process was measured using \textbf{Inter-Rater Reliability (IRR)}, specifically \textbf{Cohen's Kappa ($\kappa$)} \parencite{kappa_cohen}. This metric was chosen over simple percent agreement to robustly account for the possibility of chance agreement, with a target threshold of $\kappa > 0.80$ established to certify the dataset's reliability for training the transformer model \parencite{kappa_landis}.
+				To validate the quality of the human-generated descriptions, a blind cross-verification study was conducted. A senior domain expert will be assigned to review a random sample of $N=500$ annotated descriptions, rating them as either "Compliant" or "Non-Compliant" based on the style guide. The consistency of this quality control process was measured using \textbf{Inter-Rater Reliability (IRR)}, specifically \textbf{'s Kappa ($\kappa$)} \parencite{kappa_cohen}. This metric was chosen over simple percent agreement to robustly account for the possibility of chance agreement, with a target threshold of $\kappa > 0.80$ established to certify the dataset's reliability for training the transformer model \parencite{kappa_landis}. Details of the equation can be seen in \autoref{sec:irr}.
 			\end{indentedblock}
 			
 	\begin{figure}[H]
@@ -187,19 +186,22 @@
 		\subsubsection{Stage 2: Canonical Geometric Normalization}
 			\begin{indentedblock}{4em}{0pt}
 				Standard STEP coordinates are sensitive to global positioning; a mechanical component defined at $(0,0,0)$ generates a different token sequence than the same component translated to $(100,100,100)$. A robust model must achieve translational and rotational invariance, ensuring that the output is independent of the input's spatial frame of reference \parencites{medical_imaging_li}{rotational_invariance_muaz}. To achieve this, the B-Rep graph undergoes a rigorous \textbf{Canonical Alignment} process. This reduces the dimensionality of the learning manifold by ensuring that all semantically identical objects occupy the same region in the vector space \parencite{deepcad_wu}. The pipeline implements three transformations:
+				
 				\begin{enumerate}
-					\item \textbf{Centroid Subtraction (Translation Invariance):} The geometric center of mass $\mu$ is computed across all control points $P = \{p_1, p_2, ..., p_N\}$. All vertices are translated such that the centroid aligns with the global origin:
+					\item \textbf{Centroid Subtraction (Translation Invariance):} The geometric center of mass $\mu$ is computed across the set of control points $P$. All vertices are translated such that the centroid aligns with the global origin:
 					\begin{equation}
 						p'_i = p_i - \frac{1}{N}\sum_{j=1}^{N} p_j
 						\addformula{Centroid Transformation}
 					\end{equation}
-
+					where $p'_i$ is the new, translated spatial coordinate of the $i$-th control point, $p_i$ is the original spatial coordinate of the $i$-th control point, $N$ is the total number of control points in the set $P = \{p_1, p_2, ..., p_N\}$, and $\frac{1}{N}\sum_{j=1}^{N} p_j$ represents the geometric center of mass ($\mu$).
 					
-					\item \textbf{PCA Alignment (Rotation Invariance):} To align the geometry with a consistent canonical orientation, Principal Component Analysis (PCA) is performed on the vertex cloud \parencite{alignment_chaouch}. Then the covariance matrix $\Sigma$ is computed:
+					\item \textbf{PCA Alignment (Rotation Invariance):} To align the geometry with a consistent canonical orientation, Principal Component Analysis (PCA) is performed on the vertex cloud \parencite{alignment_chaouch}. The covariance matrix $C$ is computed:
 					\begin{equation}
-						\Sigma = \frac{1}{N} \sum_{i=1}^{N} p'_i (p'_i)^T
+						C = \frac{1}{N} \sum_{i=1}^{N} p'_i {p'_i}^T
 						\addformula{PCA Alignment}
 					\end{equation}
+					where $C$ is the $3 \times 3$ covariance matrix capturing the spatial distribution of the geometry, $N$ is the total number of control points, and $p'_i {p'_i}^T$ is the outer product for the matrix from the translated $3 \times 1$ column vector of the $i$-th control point.
+					
 					The eigenvectors $v_1, v_2, v_3$ of $\Sigma$ represent the primary, secondary, and tertiary axes of variance. The geometry is rotated via matrix $R = [v_1, v_2, v_3]$ such that the axis of greatest variance (e.g., the length of a screw) aligns with the global $z$-axis.
 					
 					\item \textbf{Ambiguity Resolution:} Standard PCA suffers from sign ambiguity (the "180-degree flip" problem). To resolve this, a deterministic "heavy-bottom" rule is enforced: if the density of points in the negative $z$ half-space is lower than in the positive half-space, the axis is flipped ($z' = -z$). This ensures consistent orientation across the dataset \parencite{3d_model_retrieval_vranic}.
@@ -217,7 +219,7 @@
 				\begin{equation}
 					\text{Order}(C) = \text{sort}_{\downarrow}\left( \{ \mathbf{f}(c) \mid c \in C \} \right)
 				\end{equation}
-				
+			
 				The invariant function $\mathbf{f}(c)$ utilizes a \textbf{Hierarchical Sorting Key}:
 				\begin{itemize}
 					\item \textbf{Primary Key ($k_1$):} \textit{Geometric Magnitude}. \textbf{Surface Area} for faces; \textbf{Curve Length} for edges. This ensures dominant features appear early, providing a stable context for attention.
@@ -225,8 +227,10 @@
 					\item \textbf{Tertiary Key ($k_3$):} \textit{Topological Degree}. The number of connected edges/loops.
 				\end{itemize}
 				
-				\paragraph{Handling Symmetries:}
-				In cases of perfect symmetry (e.g., a Cube where all faces have identical Area and Distance), a deterministic fallback utilizes the principal axis alignment from Stage 2: faces are sorted by their centroid's $Z, Y, X$ coordinates. This guarantees that a specific 3D geometry yields an identical token sequence regardless of the raw file's ID permutation \parencite{colligan_2022_hierarchical}.
+				\paragraph{Handling Symmetries}
+				\begin{indentedblock}{2em}{0pt}
+					In cases of perfect symmetry (e.g., a Cube where all faces have identical Area and Distance), a deterministic fallback utilizes the principal axis alignment from Stage 2: faces are sorted by their centroid's $Z, Y, X$ coordinates. This guarantees that a specific 3D geometry yields an identical token sequence regardless of the raw file's ID permutation \parencite{colligan_2022_hierarchical}.
+				\end{indentedblock}
 			\end{indentedblock}
 		
 		\subsubsection{Stage 4: Complex-Valued Dual-Stream Encoding}
@@ -254,10 +258,13 @@
 				
 				\begin{itemize}
 					\item \textbf{Vocabulary Expansion:} The model's embedding matrix is resized to accommodate the custom geometric tokens (e.g., \texttt{[GEO\_START]}, \texttt{<CYLINDER>}).
-					\item \textbf{Input Fusion Layer:} The Dual-Stream input from the tokenizer is fused via a linear projection layer $W_p$. This maps the 128-dim complex geometric vectors into the pre-trained model's embedding dimension $d_{model}$, allowing continuous geometric data to exist within the discrete latent space of the LLM:
+					
+					\item \textbf{Input Fusion Layer:} The Dual-Stream input from the tokenizer is fused via a linear projection layer which are used by the model to compute the final input embedding $E_{\text{input}}$ by adding the projected geometric data to the semantic token at sequence index $t$:
 					\begin{equation}
-						E_{input} = E_{semantic}(t) + (V_{complex} \cdot W_p)
+						E_{\text{input}} = E_{\text{semantic}}(t) + (V_{\text{complex}} \cdot W_p)
 					\end{equation}
+					
+					where $E_{\text{semantic}}(t)$ is the 512-dimensional pre-trained word embedding representing the semantic meaning of the token at index $t$, $V_{\text{complex}}$ is the 128-dimensional complex-valued vector from the tokenizer's geometric stream, and $W_p$ is the learnable linear projection matrix that maps the geometric vector into the model's dimension ($128 \to 512$).
 				\end{itemize}
 			\end{indentedblock}
 	
@@ -267,7 +274,7 @@
 				\begin{equation}
 					\text{Attention-RoPE}(Q, K, V) = \text{softmax}\left(\frac{(R_{\theta_i}Q)(R_{\theta_j}K)^T}{\sqrt{d_k}}\right)V
 				\end{equation}
-				where $R_{\theta}$ represents the rotation matrix derived from the tokenizer's complex input. This ensures that attention scores reflect not just semantic compatibility, but physical alignment. For example, a \texttt{SCREW} entity will attend strongly to a \texttt{HOLE} entity only if their orientation vectors (Normal vectors) are aligned (i.e., the relative rotation $\Delta\theta \approx 0$), thereby embedding physical assembly logic directly into the attention weights.
+				where $R_{\theta i}$ and $R_{\theta j}$ represents the rotation matrices derived from the tokenizer's complex input and $d_k$ is the dimension of $K$. This ensures that attention scores reflect not just semantic compatibility, but physical alignment. For example, a \texttt{SCREW} entity will attend strongly to a \texttt{HOLE} entity only if their orientation vectors (Normal vectors) are aligned (i.e., the relative rotation $\Delta\theta \approx 0$), thereby embedding physical assembly logic directly into the attention weights.
 				
 				\skiplines{1}
 				
@@ -281,23 +288,89 @@
 \section{Training and Evaluation}
 	\subsection{Training Setup: Causal Language Modeling}
 		\begin{indentedblock}{4em}{0pt}
-			Unlike classification models which minimize Cross-Entropy loss over a fixed set of classes, this model is trained using a \textbf{Causal Language Modeling (CLM)} objective (Next-Token Prediction). The goal is to maximize the probability of the text description $W$ given the geometric sequence $G$:
+			Unlike classification models which minimize Cross-Entropy loss over a fixed set of classes, the model is trained using a \textbf{Causal Language Modeling (CLM)} objective (Next-Token Prediction) denoted by $\mathcal{L}_{\text{CLM}}$ which is defined as the negative logarithm of the  cumulative error of the generated caption. The goal of the model is to maximize the probability of generating the correct target token given the geometric sequence $G$:
 			\begin{equation}
-				\mathcal{L}_{CLM} = - \sum_{t=1}^{T} \log P(w_t | w_{<t}, G; \Theta)
+				\mathcal{L}_{\text{CLM}} = - \sum_{t=1}^{T} \log \text{Pr}(w_t | w_{<t}, G; \Theta)
 			\end{equation}
+				
+			where $P$ represents the conditional probability of the target token $w_t$ at index $t$ (e.g., "Bolt") of a token sequence with length $T$ being correct, $w_{<t}$ represents the context window containing all preceding tokens, $G$ is the invariant geometric graph sequence provided by the Dual-Stream Tokenizer, and $\Theta$ represents the trainable parameters of the Transformer and Adapter layers. Since $P$ is a probabilistic function, the errors sum up to 0 in case of an erroneous output, which will result in the model learning incorrectly. Fixing this issue requires taking the negative logarithm of P to convert the small-valued loss to a massive positive penalty. The summation results in the total Cross-Entropy loss for the entire token sequence.
 			
+			\skiplines{1}
 			
-			To ensure the coherence of the generated output, the input is formatted as a prompt-response pair with the resulting structure.
-			\begin{equation}
-				\texttt{[GEO\_START] } G_{tokens} \texttt{ [GEO\_END] [DESCRIBE] } \rightarrow \text{Target Caption}
-			\end{equation}
+			To ensure the coherence of the generated output, the input is formatted as a prompt-response pair with the resulting structure:
+			
+			\begin{equation*}
+				\underbrace{\texttt{[GEO\_START]} \quad G_{\text{tokens}} \quad \texttt{[GEO\_END]} \quad \texttt{[DESCRIBE]}}_{\text{Instruction Prompt}} \quad \colon \quad \underbrace{W_{\text{target}}}_{\text{Generated Caption}}
+			\end{equation*}
+			
 			This forces the model to attend to the complete geometric graph $G$ before generating the first word of the description.
 		\end{indentedblock}
 	
 	\subsection{Evaluation Metrics}
 		\subsubsection{Metric Definition and Evaluation Thresholds}
 			\begin{indentedblock}{4em}{0pt}
-				Since the output is an open-ended natural language sequence, standard accuracy metrics are insufficient. This study employs a suite of semantic similarity metrics to evaluate the generated annotations' quality against the ground truth as specified in \autoref{tab:evaluation-metrics}.
+				Since the output is an open-ended natural language sequence, standard accuracy metrics are insufficient. This study employs a suite of semantic similarity metrics to evaluate the generated annotations' quality against the ground truth using the following metrics.
+			
+				\paragraph{BLEU-4 \parencite{bleu_papineni}}
+					\begin{indentedblock}{2em}{0pt}
+						The metric enforces terminological and geometric precision, ensuring the model correctly predicts specific technical codes (e.g., "ISO 4014") where exact matching is required. It quantifies 4-gram precision with uniform weights and a brevity penalty:
+						
+						\begin{equation}
+							\text{BLEU} = BP \cdot \exp\left( \sum_{n=1}^{4} w_n \log p_n \right)
+						\end{equation}
+						
+						where $BP$ is the brevity penalty, which penalizes generated descriptions that are too short compared to the reference text, $w_n$ represents the uniform weights assigned to each $n$-gram level (specifically $w_n = 0.25$ for $n=1, 2, 3, 4$), and $p_n$ is the modified $n$-gram precision, representing the ratio of generated $n$-grams that exactly match the ground truth.
+					\end{indentedblock}
+				\paragraph{ROUGE-L \parencite{lin_rouge}}
+					\begin{indentedblock}{4em}{0pt}
+						This metric rewards the correct syntactic flow of the engineering description, ensuring the model generates complete sentence structures rather than disjointed keywords. It measures the Longest Common Subsequence (LCS) to evaluate the output's recall and structure $R_\text{lcs}$:
+						
+						\begin{equation}
+							R_\text{lcs} = \frac{LCS(X, Y)}{m}
+						\end{equation}
+						
+						where $LCS(X, Y)$ is the length of the longest matching sequence of words between the generated candidate $Y$ and the reference truth $X$, preserving word order but allowing for gaps and $m$ is the total length (number of words) of the reference description $X$.
+					\end{indentedblock}
+				\paragraph{BERTScore \parencite{bertscore_zhang}}
+					\begin{indentedblock}{4em}{0pt}
+						BERTScore serves as the primary metric for capturing meaning and context (e.g., recognizing that "fastener" and "bolt" are semantically related). Unlike $n$-gram metrics (e.g., BLEU), it operates in latent space by using a pre-trained BERT model to compare the embedding-level overlap between the candidate and the reference textThe evaluation relies on greedy matching to calculate Recall ($R_{\text{BERT}}$), Precision ($P_{\text{BERT}}$), and the resulting F1 measure ($F_{\text{BERT}}$):
+						
+						\begin{equation}
+							R_{\text{BERT}} = \frac{1}{|x|} \sum_{x_i \in x} \max_{\hat{x}_j \in \hat{x}} \mathbf{x}_i^\top \hat{\mathbf{x}}_j, \quad 
+							P_{\text{BERT}} = \frac{1}{|\hat{x}|} \sum_{\hat{x}_j \in \hat{x}} \max_{x_i \in x} \mathbf{x}_i^\top \hat{\mathbf{x}}_j
+						\end{equation}
+						
+						\begin{equation}
+							F_{\text{BERT}} = 2 \frac{P_{\text{BERT}} \cdot R_{\text{BERT}}}{P_{\text{BERT}} + R_{\text{BERT}}}
+						\end{equation}
+						
+						where $x$ and $\hat{x}$ are the reference sequence (ground truth) and the candidate sequence (model output), $|x|$ and $|\hat{x}|$ represent the total number of tokens in the reference and candidate sequences. $\mathbf{x}_i$ and $\hat{\mathbf{x}}_j$ are the normalized, contextualized embedding vectors for the $i$-th token in the reference and the $j$-th token in the candidate sequences. $\mathbf{x}_i^\top \hat{\mathbf{x}}_j$ computes the cosine similarity (dot product) between the two embedding vectors. Lastly, the $\max$ denotes the greedy matching process, which pairs each token in one sentence to the single most semantically similar token in the other sentence.
+					\end{indentedblock}				
+				\paragraph{Human Verification (IRR)}
+				
+					\begin{indentedblock}{4em}{0pt}
+						\label{sec:irr}
+						The metric involves a manual review process where human experts verify a subset of generations against the 3D geometry. It explicitly identifies hallucinations in the model's output which are not present in the ground truth annotations and serves as the final quality check for the model.
+						
+						To evaluate the hallucination error—instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent from the B-Rep data—a manual review protocol is utilized. The reliability of the generated descriptions against human expert judgment is quantified using Cohen's Kappa ($\kappa$) which denotes the robust agreement score ranging from $-1$ to $1$. A $\kappa$ score $> 0.80$ indicates substantial reliability of the expert's verification:
+						
+						\begin{equation}
+							\kappa = \frac{p_o - p_e}{1 - p_e}
+						\end{equation}
+						
+						where $p_o$ is the relative observed agreement (the proportion of times the model's generated facts exactly match the human's binary assessment of the geometry), and $p_e$ is the hypothetical probability of chance agreement, calculated using the marginal probabilities of each rater's (or model's) classification frequencies. Each of these probabilities is mathematically derived from the evaluation confusion matrix as follows:
+						
+						\begin{equation}
+							p_o = \frac{1}{N} \sum_{i=1}^{C} n_{ii}
+						\end{equation}
+						
+						\begin{equation}
+							p_e = \frac{1}{N^2} \sum_{i=1}^{C} n_{i+} n_{+i}
+						\end{equation}
+						
+						where $N$ is the total number of sampled generation-geometry pairs evaluated during the manual review, $C$ is the number of discrete classification categories (for a binary hallucination check, $C = 2$, representing "Pass" and "Fail"), $n_{ii}$ represents the number of instances where both the model's output and the human rater agreed on category $i$ (the main diagonal of the confusion matrix). $n_{i+}$ is the marginal total of instances where the model's output corresponded to category $i$, and $n_{+i}$ is the marginal total of instances that the human expert explicitly classified as category $i$.
+					\end{indentedblock}				
+				For each of the quantitative metrics listed, a minimum threshold is determined as a way to measure the quality of the model's results. For instance, the model ideally results in a BLEU-4 score $> 0.4$ to closely match Human-to-Human results \parencite{wu_google_translate}. The minimum threshold for ROUGE-L is set to be $> 0.35$ to ensure the model does not omit necessary details of the model from the annotation \parencite{lin_rouge}. Lastly, an ideal BERTScore threshold of $> 0.85$ is chosen since it measures the similarity in meaning between 2 sentences \parencite{bertscore_zhang}. A brief summary of each evaluation metric can be seen in \autoref{tab:evaluation-metrics}.
 				
 				\begin{table}[H]
 					\centering
@@ -317,16 +390,14 @@
 						}
 						Metric & Definition \& Mathematical Formulation & Research Utility \\
 						
-						BLEU-4 \parencite{bleu_papineni}
+						BLEU-4
 						& \textbf{Focus: Geometric Precision} \newline
-						Quantifies 4-gram precision with uniform weights ($w_n=0.25$) and a Brevity Penalty ($BP$). \newline
-						$ \text{BLEU} = BP \cdot \exp\left( \sum_{n=1}^{4} w_n \log p_n \right) $ 
+						Quantifies 4-gram precision with uniform weights ($w_n=0.25$) and a Brevity Penalty ($BP$). 
 						& Enforces \textbf{terminological precision}. It ensures the model correctly predicts specific technical codes (e.g., "ISO 4014") where exact matching is required. \\
 						
 						ROUGE-L \parencite{lin_rouge}
 						& \textbf{Focus: Structural Recall} \newline
-						Measures the Longest Common Subsequence (LCS) to evaluate recall and sentence structure. \newline
-						$ R_{lcs} = \frac{LCS(X, Y)}{m} $ 
+						Measures the Longest Common Subsequence (LCS) to evaluate recall and sentence structure. 
 						& Rewards the correct \textbf{syntactic flow} of the engineering description, ensuring the model generates complete sentence structures rather than disjointed keywords. \\
 						
 						BERTScore \parencite{bertscore_zhang}
@@ -342,8 +413,6 @@
 					\end{tblr}
 					\label{tab:evaluation-metrics}
 				\end{table}
-				
-				For each of the quantitative metrics listed in \autoref{tab:evaluation-metrics}, a minimum threshold is determined as a way to measure the quality of the model's results. For instance, the model ideally results in a BLEU-4 score $> 0.4$ to closely match Human-to-Human results \parencite{wu_google_translate}. The minimum threshold for ROUGE-L is set to be $> 0.35$ to ensure the model does not omit necessary details of the model from the annotation \parencite{lin_rouge}. A BERTScore threshold of $> 0.85$ is ideal for annotation since it measures the similarity in meaning between 2 sentences \parencite{bertscore_zhang}. Lastly, human verification will be measured using Cohen's $\kappa$ as stated in Section \ref{sec:irr} \parencite{kappa_landis}. 
 				
 			\end{indentedblock}
 		\subsubsection{Harmonization of Divergent Metrics}
