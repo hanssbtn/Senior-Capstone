@@ -12,4 +12,5 @@
 *.lot
 *.out
 *.eqs
-Dataset
+Code/dataset
+Code/secret.env
