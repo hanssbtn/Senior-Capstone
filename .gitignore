@@ -12,4 +12,4 @@
 *.out
 *.eqs
 Code/secret.env
-Code/dataset/*.zip
+Code/dataset/*/
