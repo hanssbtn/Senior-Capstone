@@ -11,5 +11,5 @@
 *.lot
 *.out
 *.eqs
-Code/dataset
 Code/secret.env
+Code/dataset/*.zip
