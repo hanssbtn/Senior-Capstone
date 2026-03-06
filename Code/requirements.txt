@@ -16,6 +16,7 @@ evaluate
 rouge-score
 bert_score
 nltk
+bitsandbytes>=0.46.1
 
 # --- CAD Processing (Specific for .step files) ---
 # CadQuery 2.7+ is required for Python 3.12 stability
