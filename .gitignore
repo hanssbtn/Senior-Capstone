@@ -11,6 +11,6 @@
 *.out
 *.eqs
 Code/secret.env
-Code/dataset/*
+Code/dataset/abc_0000_step_v00*
 Code/models/qwen2.5/model.safetensors
 Code/model/roberta-base/model.safetensors
