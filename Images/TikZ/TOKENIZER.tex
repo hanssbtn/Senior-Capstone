@@ -69,14 +69,10 @@
 		node distance=1.5cm		
 		]
 		
-		% =========================================================
-		% ROW 1: PRE-PROCESSING (Invariance)
-		% =========================================================
-		
 		% --- STAGE 1 (Top Left) ---
-		\node[op_block] (s1_step1) {Scan for Sub-structures};
-		\node[op_block, below=0.6cm of s1_step1] (s1_step2) {Collapse into Macros\\e.g., \texttt{<CYLINDER\_PRIM>}};
-		\node[stage_title, above=0.2cm of s1_step1] (s1_title) {Stage 1:\\Semantic Macro-Compression};
+		\node[op_block] (s1_step1) {1. Centering\\(Translate to Origin)};
+		\node[op_block, below=0.6cm of s1_step1] (s1_step2) {2. PCA Alignment\\(Rotate to Z-Axis)};
+		\node[stage_title, above=0.2cm of s1_step1] (s1_title) {Stage 1:\\Canonical Normalization};
 		
 		% Internal Arrow
 		\draw[line] (s1_step1) -- (s1_step2);
@@ -88,9 +84,9 @@
 		
 		% --- STAGE 2 (Top Right) ---
 		% Align relative to Stage 1 to maintain grid
-		\node[op_block, right=5cm of s1_step1] (s2_step1) {1. Centering\\(Translate to Origin)};
-		\node[op_block, below=0.6cm of s2_step1] (s2_step2) {2. PCA Alignment\\(Rotate to Z-Axis)};
-		\node[stage_title, above=0.2cm of s2_step1] (s2_title) {Stage 2:\\Canonical Normalization};
+		\node[op_block, right=6cm of s1_step1] (s2_step1) {Instantiate\\B-Rep DiGraph};
+		\node[op_block, below=0.6cm of s2_step1] (s2_step2) {Extract \& Cache\\Geometric Vectors};
+		\node[stage_title, above=0.2cm of s2_step1] (s2_title) {Stage 2:\\Geometric Data Extraction};
 		
 		% Internal Arrow
 		\draw[line] (s2_step1) -- (s2_step2);
@@ -101,14 +97,14 @@
 		\end{scope}
 		
 		% =========================================================
-		% ROW 2: SERIALIZATION
+		% ROW 2: COMPRESSION & SERIALIZATION
 		% =========================================================
 		
 		% --- STAGE 3 (Bottom Left) ---
 		% Align directly below Stage 1
-		\node[op_block, below=4.5cm of s1_step2] (s3_step1) {Identify Parent $N_p$};
-		\node[op_block, below=0.6cm of s3_step1] (s3_step2) {Sort Children by $f(c)$ \\(e.g., Surface Area)};
-		\node[stage_title, above=0.2cm of s3_step1] (s3_title) {Stage 3:\\Topological Linearization};
+		\node[op_block, below=4.5cm of s1_step2] (s3_step1) {Scan for Sub-structures};
+		\node[op_block, below=0.6cm of s3_step1] (s3_step2) {Collapse into Macros\\e.g., \texttt{<CYLINDER\_PRIMITIVE>}};
+		\node[stage_title, above=0.2cm of s3_step1] (s3_title) {Stage 3:\\Semantic Macro-Compression};
 		
 		% Internal Arrow
 		\draw[line] (s3_step1) -- (s3_step2);
@@ -120,18 +116,24 @@
 		
 		% --- STAGE 4 (Bottom Right) ---
 		% Align directly below Stage 2
-		% We use a coordinate to ensure the streams are centered under Stage 2
 		\coordinate (stage4_center) at (stage2.center |- stage3.center);
 		
-		\node[stream_block, fill=green!5, draw=green!60!black] (streamA) at (stage4_center) [xshift=-2.2cm, yshift=-0.5cm] {\textbf{Stream A}\\(Semantic Tokens)\\\vspace{4pt}\texttt{<FACE>}, \texttt{<EDGE>}};
+		% Add the DFS block centered at the top of Stage 4
+		\node[op_block] (s4_step1) at (stage4_center) [yshift=1cm] {Topological Serialization via Canonical DFS};
+		
+		\node[stream_block, fill=green!5, draw=green!60!black] (streamA) at (stage4_center) [xshift=-2.25cm, yshift=-1.5cm] {\textbf{Stream A}\\(Semantic Tokens)\\\vspace{4pt}\texttt{<FACE>}, \texttt{<EDGE>}};
 		
 		\node[stream_block, fill=purple!5, draw=purple!60!black, right=0.5cm of streamA] (streamB) {\textbf{Stream B}\\(Geometric Embeddings)\\\vspace{4pt}$z = r + i\theta$};
 		
-		\node[stage_title] (s4_title) at ($(streamA.north)!0.5!(streamB.north) + (0, 0.7)$) {Stage 4:\\Dual-Stream Encoding};
+		\node[stage_title, above=0.2cm of s4_step1] (s4_title) {Stage 4:\\Serialization \& Dual-Stream};
+		
+		% Internal Arrows splitting into Dual Stream
+		\draw[line] (s4_step1.south) -- ++(0,-0.375) -| (streamA.north);
+		\draw[line] (s4_step1.south) -- ++(0,-0.375) -| (streamB.north);
 		
 		% Fit Box
 		\begin{scope}[on background layer]
-			\node[stage_box, fit=(s4_title) (streamA) (streamB)] (stage4) {};
+			\node[stage_box, fit=(s4_title) (s4_step1) (streamA) (streamB)] (stage4) {};
 		\end{scope}
 		
 		% =========================================================
@@ -139,41 +141,40 @@
 		% =========================================================
 		
 		% 1. Stage 1 -> Stage 2
-		\draw[line] (stage1) -- node[above, font=\small\bfseries, color=gray] {Macro Graph} (stage2);
+		\draw[line] (stage1) -- node[above, font=\small\bfseries, color=gray, align=center] {Normalized\\Graph} (stage2);
 		
 		% 2. Stage 2 -> Stage 3 (Down and Left)
-		% We draw a line out the bottom of S2, down, then over to top of S3
-		\draw[line, rounded corners=10pt] (stage2.south) -- ++(0,-0.5) -| (stage3.north);
+		% Draws a line out the bottom of S2, down, then over to top of S3
+		\draw[line, rounded corners=10pt] (stage2.south) -- ++(0,-0.5) -| node[near end, above, font=\small\bfseries, color=gray, xshift=-1.25cm] {B-Rep Graph} (stage3.north);
 		
 		% 3. Stage 3 -> Stage 4
-		\draw[line] (stage3.east) -- node[above, font=\small\bfseries, color=gray, text width=2.5cm, align=center] {Token Sequence} (stage4.west |- stage4_center);
+		\draw[line] (stage3.east) -- node[above, font=\small\bfseries, color=gray, text width=4cm, align=center] {Compressed\\Graph} (stage4.west |- stage4_center);
 		
 		% 4. Final Output Arrow (Coming out of Stage 4)
-		\node[right=1.5cm of stage4, font=\bfseries\large, align=center, color=gray!80!black] (output_label) {\includegraphics[width=2cm]{stacks_60dp_FFD41D_FILL0_wght400_GRAD0_opsz48.png}};
-		\node[minimum  size=2.25cm, right=1.5cm of stage4, font=\bfseries\large, align=center, color=gray!80!black] (output_label) {Final\\Tensor};
-		\draw[line] (stage4.east) -- (output_label.west);
+		\node[right=1.5cm of stage4, font=\bfseries\large, align=center, color=gray!80!black] (output_icon) {\includegraphics[width=2cm]{stacks_60dp_FFD41D_FILL0_wght400_GRAD0_opsz48.png}};
+		\node[below=0.1cm of output_icon, minimum size=2.25cm, font=\bfseries\large, align=center, color=gray!80!black] (output_label) {Final\\Tensor};
+		\draw[line] (stage4.east |- stage4_center) -- (output_icon.west |- stage4_center);
 		
 		
 		% =========================================================
 		% INPUT LABEL
 		% =========================================================
-		\node[left=1.5cm of stage1, font=\bfseries\large, align=center, color=gray!80!black] (input_label) {\includegraphics[width=2cm]{../TikZ/file_present_60dp_FFD41D_FILL0_wght400_GRAD0_opsz48.png}};
-		\node[left=1.5cm of stage1, font=\bfseries\large, align=center, color=gray!80!black] (input_label) {Raw\\STEP File};
+		\node[left=1.5cm of stage1, font=\bfseries\large, align=center, color=gray!80!black] (input_icon) {\includegraphics[width=2cm]{../TikZ/file_present_60dp_FFD41D_FILL0_wght400_GRAD0_opsz48.png}};
+		\node[below=0.1cm of input_icon, font=\bfseries\large, align=center, color=gray!80!black] (input_label) {Raw\\STEP File};
 		
-		\draw[line] (input_label.east) -- (stage1.west);
+		\draw[line] (input_icon.east |- stage1.west) -- (stage1.west);
 		
 		\path (stage1.north) ++(0, 1cm) coordinate (point);
 		\begin{scope}[on background layer]
 			% We fit all the extreme nodes: Input, Output, and the Stages
 			\node[
 			tokenizer_frame, 
-			fit=(input_label) (output_label) (stage1) (stage2) (stage3) (stage4) (point),
+			fit=(input_icon) (input_label) (output_icon) (output_label) (stage1) (stage2) (stage3) (stage4) (point),
 			] (wrapper) {};
 			
 			% Add the label for the whole system
 			\node[font=\bfseries\LARGE, color=darkgray!80, anchor=north, inner sep=15pt] (tokenizer)
 			at (wrapper.north) {Proposed B-Rep Tokenizer};
 		\end{scope}
-		
 	\end{tikzpicture}
 \end{document}
