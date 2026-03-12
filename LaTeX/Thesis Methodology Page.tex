@@ -4,7 +4,7 @@
 \begingroup
 \fontsize{12pt}{\baselineskip}\selectfont
 \section{Data Gathering}
-	Training a descriptive model effectively necessitates a large-scale, high-fidelity dataset that pairs geometric representations with semantic natural language. However, unlike 2D image-captioning domains, the 3D CAD landscape suffers from a significant scarcity of standardized, human-readable annotations. To address this sparsity, a comprehensive acquisition framework was developed to ingest raw geometric data, filter for quality, and semantically enrich samples through a hybrid HITL process. A summary of the dataset preprocessing steps can be seen in \autoref{fig:dataset-acquisition-and-filtering-flowchart}.
+	Training a descriptive model effectively necessitates a large-scale, high-fidelity dataset that pairs geometric representations with semantic natural language. However, unlike 2D image-captioning domains, the 3D CAD landscape suffers from a significant scarcity of standardized, human-readable annotations. A comprehensive data acquisition framework was developed to handle the sparse data availability. The procedure involves ingesting raw geometric data, filtering for quality and file size, and semantically enrich samples through a hybrid HITL process. A summary of the dataset preprocessing steps can be seen in \autoref{fig:dataset-acquisition-and-filtering-flowchart}.
 	
 	\subsection{Dataset Source Selection}
 		\begin{indentedblock}{4em}{0pt}
@@ -15,20 +15,21 @@
 			\begin{table}[H]
 				\centering
 				\caption{Comparison of CAD Dataset Sources.}
-				\small
+				\fontsize{10pt}{1\baselineskip}\selectfont
 				\begin{tblr}{
 						width=\linewidth, % Forces table to be as wide as the page
 						colspec={
 							Q[c,m,1.5cm]  
-							Q[c,m,1.5cm]  
-							X[2,c,m]    
-							X[1.5,c,m]   
-							X[1.5,c,m]    %
+							Q[c,m,1.25cm]  
+							X[1.5,c,m]    
+							X[2,c,m]   
+							X[1.75,c,m]    %
 						},
 						hlines,
 						vlines,
 						cells={valign=m, halign=l}, 
-						rowsep=2pt 
+						rowsep=2pt,
+						row{1}={font=\bfseries, halign=c, valign=m, bg=gray9}
 					}
 					\textbf{Source} & \textbf{Type} & \textbf{Summary} & \textbf{Advantages} & \textbf{Disadvantages} \\
 					
@@ -45,7 +46,7 @@
 				\label{tab:dataset-comparison-table}
 			\end{table} 
 			
-			Based on the analysis detailed in \autoref{tab:dataset-comparison-table}, this paper will utilize a combination of CAD designs contained in Text2CAD as well as other online sources such as the ABC dataset and TraceParts. This combination ensures a balance between labeled semantic data (Text2CAD) and high-fidelity geometric variety (TraceParts). To help minimize discrepancies between annotations of several different datasets, a standard for annotation format mimicking the existing annotations in the Text2CAD dataset will be used.
+			Based on the analysis detailed in \autoref{tab:dataset-comparison-table}, this paper will utilize a combination of CAD designs contained in the ABC dataset as well as other online sources such as TraceParts. This combination ensures the dataset contains a balance between real-world user designs (ABC) and high-definition examples that adhere to industry standards (TraceParts). To generate standardized annotations from several different datasets sources, a standard for annotation format mimicking the existing annotations in the Text2CAD dataset will be used.
 			
 		\end{indentedblock}
 
@@ -98,12 +99,13 @@
 							colspec={
 								Q[l,m,1.6cm]   % Level: Fixed, narrow
 								X[1.5,l,m]     % Scope: Flexible, narrow-medium
-								X[2.2,l,m]     % Definition: Flexible, medium
-								X[3.5,l,m]     % Example: Flexible, widest
+								X[2.5,l,m]     % Definition: Flexible, medium
+								X[2.75,l,m]     % Example: Flexible, widest
 							},
 							hlines,
 							vlines,
 							cells={valign=m},   % Vertically center all text
+							row{1}={font=\bfseries, halign=c, valign=m, bg=gray9}, 
 							rowsep=3pt          % Tightens vertical padding
 						}
 						\textbf{Level} & \textbf{Scope} & \textbf{Definition} & \textbf{Example Annotation} \\
@@ -128,7 +130,7 @@
 				\end{table}
 				
 			\end{indentedblock}
-					
+		
 		\subsubsection{Annotation Validation using BERTScore and Inter-Rater Reliability}
 			\begin{indentedblock}{4em}{0pt}
 				Since the dataset is comprised of multiple sources, with most lacking the necessary descriptive texts, an additional annotation step is needed. Unlike simple classification, generating natural language descriptions requires high-fidelity textual data that automated processes cannot fully synthesize. To extend the dataset beyond the pre-annotated Text2CAD samples, a \textbf{Human-in-the-Loop (HITL)} annotation pipeline is employed. Unlike simple filtering, this process utilizes \textbf{BERTScore} \parencite{bertscore_zhang} as a semantic validation metric to guide the manual annotation process, ensuring that new descriptions align stylistically with the established Text2CAD annotation schema specified in \autoref{tab:annotation-levels}.
@@ -149,8 +151,8 @@
 		\label{fig:dataset-acquisition-and-filtering-flowchart}
 	\end{figure}
 % --- SECTION 3.2 ---
-\section{Model Design}
-	\label{sec:model-design}
+\section{Tokenizer Design}
+	\label{sec:tokenizer-design}
 	This research proposes a novel \textit{Hierarchical Dual-Stream Tokenizer} designed specifically to address the non-Euclidean nature of B-Rep (Boundary Representation) data. Unlike standard Natural Language Processing (NLP) tokenizers, which treat input as a continuous 1D string under the assumption that positional proximity equals semantic relationship, the proposed method treats the STEP file as a \textbf{topological graph}. This distinction is critical, as in raw B-Rep data, geometric entities that are physically adjacent (e.g., two faces sharing an edge) may be defined thousands of lines apart in the file structure. Therefore, \textbf{normalization} is required to remove coordinate invariance, and then \textbf{compressed} to eliminate redundant entity definitions, and \textbf{linearized} via a  graph traversal to preserve local geometric neighborhoods before ingestion.
 	
 	% --- SUBSECTION 3.2.1 ---
@@ -174,16 +176,7 @@
 			\end{figure}
 		\end{indentedblock}
 	
-		\subsubsection{Stage 1: Semantic Macro-Compression}
-			\begin{indentedblock}{4em}{0pt}
-				Raw STEP files exhibit extreme verbosity, where semantically simple manufacturing features are explicitly defined by dozens of constituent low-level topological entities. For example, a semantic feature such as a "Through-Hole" is not represented as a single entity, but as two \texttt{CIRCLE} edges connected to a \texttt{CYLINDRICAL\_SURFACE}, which are further linked to multiple \texttt{VERTEX\_POINT} definitions. As noted in foundational generative studies, such excessive sequence length dilutes the attention mechanism's ability to model global structure, often leading to convergence failure on complex assemblies \parencite{deepcad_wu}. Furthermore, flat B-Rep graphs fail to capture the hierarchical nature of mechanical assemblies, necessitating a multi-level graph representation to efficiently encode topological adjacency \parencite{colligan_2022_hierarchical}.
-				
-				\skiplines{1}
-				
-				Mitigating this issue necessitates a \textbf{Semantic Graph Contraction} algorithm to be applied as a pre-tokenization step. A rule-based parser performs subgraph isomorphism checks to identify and compress known topological patterns into smaller, niche tokens. One example of this is a \texttt{CYLINDRICAL\_SURFACE} bounded by two \texttt{CIRCLE} edges is fused into a single macro-node with identifier \texttt{<CYLINDER\_PRIMITIVE>}. Similarly, adjacent chains of tangential \texttt{B\_SPLINE\_SURFACE} patches are aggregated into \texttt{<FILLET\_CHAIN>} macros. This heuristic reduces the sequence length while retaining the semantic essence of the geometry, effectively increasing the model's receptive field.
-			\end{indentedblock}
-			
-		\subsubsection{Stage 2: Canonical Geometric Normalization}
+		\subsubsection{Stage 1: Canonical Geometric Normalization}
 			\begin{indentedblock}{4em}{0pt}
 				Standard STEP coordinates are sensitive to global positioning; a mechanical component defined at $(0,0,0)$ generates a different token sequence than the same component translated to $(100,100,100)$. A robust model must achieve translational and rotational invariance, ensuring that the output is independent of the input's spatial frame of reference \parencites{medical_imaging_li}{rotational_invariance_muaz}. To achieve this, the B-Rep graph undergoes a rigorous \textbf{Canonical Alignment} process. This reduces the dimensionality of the learning manifold by ensuring that all semantically identical objects occupy the same region in the vector space \parencite{deepcad_wu}. The pipeline implements three transformations:
 				
@@ -207,8 +200,84 @@
 					\item \textbf{Ambiguity Resolution:} Standard PCA suffers from sign ambiguity (the "180-degree flip" problem). To resolve this, a deterministic "heavy-bottom" rule is enforced: if the density of points in the negative $z$ half-space is lower than in the positive half-space, the axis is flipped ($z' = -z$). This ensures consistent orientation across the dataset \parencite{3d_model_retrieval_vranic}.
 				\end{enumerate}
 			\end{indentedblock}
+			
+		\subsubsection{Stage 2: Geometric Data Extraction}
+			\begin{indentedblock}{4em}{0pt}
+				To preserve high-fidelity precision (e.g., NURBS weights) without bloating the discrete vocabulary, a Dual-Stream architecture is used. The tokenizer emits two parallel streams for every step $t$:
+				\begin{itemize}
+					\item \textbf{Stream A (Semantic Tokens):} Discrete integers representing the categorical type of entity/macro token (e.g., \texttt{<PLANE>}, \texttt{<CIRCLE>}, \texttt{<FILLET\_CHAIN>}).
+					\item \textbf{Stream B (Geometric Embeddings):} A 128-dimensional \textbf{Complex-Valued Vector} encoding the shape parameters.
+				\end{itemize}
+			\end{indentedblock}
+			
+			\begin{indentedblock}{4em}{0pt}
+				The complex vector $v \in \mathbb{C}^{64}$ encodes the geometry as $z = r + i\theta$. The real part $r$ represents scale-invariant magnitudes (e.g., radius), while the imaginary part $\theta$ encodes the relative orientation. This formulation is inspired by Euler's formula ($e^{i\theta}$), allowing the model to perform rotation operations purely through phase shifts in the complex domain.
+			\end{indentedblock}
 		
-		\subsubsection{Stage 3: Topological Linearization (Canonical DFS)}
+		\subsubsection{Stage 3: Semantic Macro-Compression}
+			\begin{indentedblock}{4em}{0pt}
+				Raw STEP files exhibit extreme verbosity, where semantically simple manufacturing features are explicitly defined by dozens of constituent low-level topological entities. As noted in foundational generative studies, such excessive sequence length dilutes the attention mechanism's ability to model global structure, often leading to convergence failure on complex assemblies \parencite{deepcad_wu}. Furthermore, flat B-Rep graphs fail to capture the hierarchical nature of mechanical assemblies, necessitating a multi-level graph representation to efficiently encode topological adjacency \parencite{colligan_2022_hierarchical}. 
+				
+				\skiplines{1}
+				
+				Alleviating the sequence length bottleneck imposed by transformer context windows requires the implementation of a tokenization pipeline with a deterministic Semantic Macro-Compression step. Using graph isomorphism matching, specific repetitive subgraphs are identified and collapsed into singular \textbf{Macro Tokens}. For instance, a physical hole in a CAD model involves a complex web of a \texttt{<CYLINDRICAL\_SURFACE>}, two intersecting \texttt{<CIRCLE>} edges, and their bounding \texttt{<PLANE>}s. These are compressed into a single \texttt{<THROUGH\_HOLE>} node, and the Euclidean distance between the plane centroids is calculated and explicitly stored as the hole's depth. The defined macro tokens and their engineering justifications are outlined in \autoref{tab:macro-tokens}.
+				
+				\begin{table}[H]
+					\centering
+					\caption{Defined Semantic Macro Tokens and Topological Justifications}
+					\fontsize{10pt}{1\baselineskip}\selectfont
+					\begin{tblr}{
+							width=\linewidth,
+							colspec={
+								Q[c,m,0.275\linewidth]  % Macro Token
+								X[1.25,l,m]            % Entities
+								X[1.5,j,m]            % Justification
+							},
+							hlines,
+							vlines,
+							row{1}={font=\bfseries, halign=c, valign=m, bg=gray9}, 
+							cell{2-6}{1}={font=\ttfamily} % Make the macro tokens typewriter font
+						}
+						Macro Token & Subgraph Template / Replaced Entities & Topological Justification \\
+						
+						<THROUGH\_HOLE> 
+						& \texttt{<CYLINDRICAL\_SURFACE>} connected to two \texttt{<CIRCLE>} edges and two bounding \texttt{<PLANE>}s. 
+						& Reduces the graph footprint of a standard drilled hole from 5+ nodes to 1. Automatically computes hole depth based on plane-to-plane distance. \\
+						
+						<CHAMFER\_EDGE> 
+						& \texttt{<CONICAL\_SURFACE>} connected to two \texttt{<CIRCLE>} edges and two bounding \texttt{<PLANE>}s. 
+						& Consolidates bevels and chamfers used to reduce sharp edges, lowering noise in the structural sequence. \\
+						
+						<CYLINDER\_PRIMITIVE> 
+						& A closed \texttt{<CYLINDRICAL\_SURFACE>} representing a solid cylindrical mass. 
+						& Identifies base shafts, pins, or extrusions before secondary boolean operations are applied, preserving base geometry intent. \\
+						
+						<SPHERE\_PRIMITIVE> 
+						& A complete \texttt{<SPHERICAL\_SURFACE>}. 
+						& Reduces node-clutter for perfectly spherical solids (e.g., ball bearings), extracting the radius directly into the geometric vector. \\
+						
+						<FILLET\_CHAIN> 
+						& Sequences of adjacent toroidal or advanced faces blending sharp transitions. 
+						& Fillets are aesthetically and structurally important but semantically trivial. Compressing them prevents the token sequence from being dominated by edge-blending data. \\
+					\end{tblr}
+					\label{tab:macro-tokens}
+				\end{table}
+				
+				\paragraph{Macro Token Dictionary and Compression Order}
+					\begin{indentedblock}{2em}{0pt}
+						Although collapsing subgraphs into macro tokens may significantly shorten the token sequence length, there are strict mathematical and computational constraints that prohibit the creation of an overly expansive macro dictionary (e.g., defining tokens for highly specific shapes like \texttt{<HEXAGONAL\_POCKET\_WITH\_CHAMFER>}). The reasons for limiting the macro tokens are threefold:
+						
+						\begin{enumerate}
+							\item \textbf{Vocabulary Sparsity and Embedding Quality:} The transformer relies on statistical frequency to learn high-quality embeddings. If highly specific macros are defined, their occurrence across the dataset will be extremely rare (forming a long-tail distribution). This means that with the model lacks sufficient training samples to adequately adjust the vector weights for these rare tokens, leading to poor generalization.
+							\item \textbf{Loss of Compositional Flexibility:} Transformers inherently excel at compositional reasoning, which involves combining simple, foundational tokens to understand complex, novel objects. Over-compressing the graph into strict, pre-defined shapes removes the model's ability to interpret unique geometric variations that do not perfectly align with a programmed template.
+							\item \textbf{Computational Overhead of Subgraph Isomorphism:} The compression stage relies on Graph Isomorphism matching, which is historically an NP-complete problem. As the complexity of the templates and the size of the dictionary increase, the time required to parse and compress the raw B-Rep graphs scales exponentially. Limiting the macros to fundamental, highly frequent features guarantees that the data preprocessing remains computationally tractable.
+						\end{enumerate}
+						
+						The execution order of the macro-compression pipeline is strictly prioritized in descending order of topological complexity. The graph is scanned for composite manufacturing features (e.g., holes, chamfers, fillets) prior to isolated primitives (e.g., spheres, standalone cylinders), and concludes with foundational base features (e.g., planar surfaces). This hierarchical, greedy-matching strategy is necessary to prevent destructive interference during token compression. For instance, compressing primitive cylinders before holes will result in the internal cylindrical face of a drilled hole being prematurely collapsed into an isolated \texttt{<CYLINDER\_PRIMITIVE>}. Consequently, the broader \texttt{<THROUGH\_HOLE>} subgraph template would fail to match, incorrectly leaving the associated bounding circular edges and planar surfaces stranded in the sequence. 
+					\end{indentedblock}
+			\end{indentedblock}
+		
+		\subsubsection{Stage 4: Topological Linearization via Canonical DFS}
 			\begin{indentedblock}{4em}{0pt}
 				Since Transformers utilize positional encoding to interpret sequence order, the serialization of the B-Rep graph must be strictly deterministic. Standard Depth-First Search (DFS) is insufficient because it is sensitive to the stochastic permutation of entity identifiers in the STEP file (e.g., visiting \texttt{\#10=FACE} before \texttt{\#20=FACE} based purely on arbitrary ID assignment). This introduces \textbf{Graph Isomorphism Ambiguity}, where identical geometries produce different sequences, forcing the model to waste capacity learning to ignore these permutations \parencite{deepcad_wu}.
 				
@@ -232,19 +301,6 @@
 					In cases of perfect symmetry (e.g., a Cube where all faces have identical Area and Distance), a deterministic fallback utilizes the principal axis alignment from Stage 2: faces are sorted by their centroid's $Z, Y, X$ coordinates. This guarantees that a specific 3D geometry yields an identical token sequence regardless of the raw file's ID permutation \parencite{colligan_2022_hierarchical}.
 				\end{indentedblock}
 			\end{indentedblock}
-		
-		\subsubsection{Stage 4: Complex-Valued Dual-Stream Encoding}
-			\begin{indentedblock}{4em}{0pt}
-				To preserve high-fidelity precision (e.g., NURBS weights) without bloating the discrete vocabulary, a Dual-Stream architecture is used. The tokenizer emits two parallel streams for every step $t$:
-				\begin{itemize}
-					\item \textbf{Stream A (Semantic Tokens):} Discrete integers representing the categorical type of entity (e.g., \texttt{<FACE>}, \texttt{<NURBS\_CURVE>}).
-					\item \textbf{Stream B (Geometric Embeddings):} A 128-dimensional \textbf{Complex-Valued Vector} encoding the shape parameters.
-				\end{itemize}
-			\end{indentedblock}
-	
-		\begin{indentedblock}{4em}{0pt}
-			The complex vector $v \in \mathbb{C}^{64}$ encodes the geometry as $z = r + i\theta$. The real part $r$ represents scale-invariant magnitudes (e.g., radius), while the imaginary part $\theta$ encodes the relative orientation. This formulation is inspired by Euler's formula ($e^{i\theta}$), allowing the model to perform rotation operations purely through phase shifts in the complex domain.
-		\end{indentedblock}
 	
 	% --- SUBSECTION 3.2.2 ---
 	\subsection{Model Architecture: The Geometric-Semantic Adapter}
@@ -284,8 +340,9 @@
 				
 				Consider a complex mechanical assembly consists of multiple sub-structures (e.g., orthogonal bosses, angled chamfers, intersecting bores) defined by their relative angular offsets. RoPE is utilized  to encode \textbf{Local Covariance}: it allows the attention mechanism to measure the relative orientation ($\Delta \theta$) between any two topological entities $i$ and $j$. This enables the model to distinguish distinct morphological classes based purely on internal angular relationships, such as distinguishing a $90^\circ$ "Elbow Fitting" from a $45^\circ$ variant, even after both have been globally aligned to the canonical $z$-axis.
 			\end{indentedblock}
-	
+% --- SECTION 3.3 ---
 \section{Training and Evaluation}
+	% --- SUBSECTION 3.3.1 ---
 	\subsection{Training Setup: Causal Language Modeling}
 		\begin{indentedblock}{4em}{0pt}
 			Unlike classification models which minimize Cross-Entropy loss over a fixed set of classes, the model is trained using a \textbf{Causal Language Modeling (CLM)} objective (Next-Token Prediction) denoted by $\mathcal{L}_{\text{CLM}}$ which is defined as the negative logarithm of the  cumulative error of the generated caption. The goal of the model is to maximize the probability of generating the correct target token given the geometric sequence $G$:
@@ -321,6 +378,24 @@
 			where $N$ is the number of output tokens generated by the model.
 			This forces the model to attend to the complete geometric graph $G$ before generating the first word of the description.
 		\end{indentedblock}
+		
+		\subsubsection{Parameter-Efficient Dual-Stream Fine-Tuning}
+			\begin{indentedblock}{4em}{0pt}
+				The training phase leverages a Parameter-Efficient Fine-Tuning (PEFT) strategy to adapt the base Large Language Model (e.g., GPT-2) to the specialized task of B-Rep annotation without requiring full-parameter updates. The custom architecture, denoted as \mintinline{python}{GeometricSemanticModel}, 
+				effectively fuses the discrete text tokens and the continuous geometric data.
+				
+				\skiplines{1}
+				
+				Bridging the modality gap involves projecting the 128-dimensional geometric vector extracted from the topological graph (Stream B) into the $n$-dimensional semantic embedding space of the base model. This is achieved via a trainable linear projection layer ($W_p$), allowing the transformer to process geometric parameters natively alongside text token embeddings.
+				
+				\skiplines{1}
+				
+				The model is optimized using the AdamW optimizer, selected for its efficient handling of weight decay and moving averages of past gradients (momentum). However, because the Dual-Stream inputs introduce complex-valued math vectors, the training loop is highly susceptible to gradient spikes. To guarantee numerical stability and prevent infinite or NaN (Not a Number) loss values, \textbf{Gradient Clipping} is enforced, unscaling the gradients and clipping them at a maximum norm of 1.0 before the optimizer steps.
+				
+				\skiplines{1}
+				
+				Furthermore, to maximize hardware utility and reduce VRAM constraints, the training pipeline implements \textbf{Mixed Precision Training} via PyTorch's \texttt{GradScaler}. Memory efficiency is further enhanced by \textbf{Gradient Accumulation}, which simulates larger batch sizes by accumulating gradients over multiple forward passes before executing a singular optimizer step and updating the model weights. Low-Rank Adaptation (LoRA) is utilized to freeze the majority of the pre-trained weights, updating only a low-rank decomposition of the attention matrices. This preserves the base model's linguistic capabilities while rapidly learning the spatial mappings of the CAD domain.
+			\end{indentedblock}
 	
 	\subsection{Evaluation Metrics}
 		\subsubsection{Metric Definition and Evaluation Thresholds}
@@ -391,7 +466,7 @@
 				\begin{table}[H]
 					\centering
 					\caption{Summary of Evaluation Metrics for Geometric Captioning}
-					\small
+					\fontsize{12pt}{1\baselineskip}\selectfont
 					\begin{tblr}{
 							width=\linewidth,
 							colspec={
@@ -431,7 +506,7 @@
 				\end{table}
 				
 			\end{indentedblock}
-		\subsubsection{Harmonization of Divergent Metrics}
+		\subsubsection{BLEU vs BERTScore}
 			\begin{indentedblock}{4em}{0pt}
 				It is recognized in Natural Language Generation (NLG) literature that semantic metrics (BERTScore) and $n$-gram metrics (BLEU) can exhibit an inverse correlation; increasing the "creativity" of a model often improves semantic flow at the cost of exact word matching. Resolving this tension and ensure robust evaluation requires an implementation of a \textbf{Hierarchical Metric Prioritization} strategy that aligns specific metrics with the annotation levels defined in \autoref{tab:annotation-levels} as defined below:
 				
@@ -443,6 +518,7 @@
 					At the detailed level, synonymy is strictly forbidden for engineering constraints (e.g., "M8" $\neq$ "M6"). Here, the evaluation logic inverts: a high BLEU score is mandatory. If a generation achieves high BERTScore but low BLEU at this level, it is flagged as a \textbf{"Hallucination Failure"}, indicating the model generated a plausible-sounding but factually incorrect specification.
 				\end{itemize}
 				
-				By treating the metrics as complementary filters rather than competing objectives, the model can distinguish between \textit{benign stylistic variations} (penalized by BLEU but accepted by BERTScore) and \textit{critical engineering errors} (penalized by both).
+				By treating the metrics as complementary filters rather than competing objectives, the model can distinguish between \textit{benign stylistic variations} (penalized by BLEU but accepted by BERTScore) and \textit{critical engineering errors} (penalized by both). Because the model generates all three hierarchical levels autoregressively as a single continuous string during inference, a programmatic parsing step is introduced during evaluation. By using the indivisible \texttt{[L1]}, \texttt{[L2]}, and \texttt{[L3]} macro tokens as string delimiters, the evaluation script slices the generated output into its constituent tiers. This allows the framework to dynamically apply BERTScore strictly to the extracted abstract text (Level 1) and BLEU strictly to the extracted parametric data (Level 3), achieving granular evaluation of a single generated sequence.
 			\end{indentedblock}
+		
 \endgroup
