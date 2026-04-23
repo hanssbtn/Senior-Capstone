@@ -67,6 +67,14 @@
 				
 				Furthermore, recent studies indicate that this vulnerability is exacerbated in high-variability datasets. Research by \textcite{memorization_effect_you} demonstrates that machine learning models struggle significantly to identify low-occurrence classes where the "class pattern" breaks due to high intra-class variance. A minimum threshold of 100 instances is enforced during the filtering process, ensuring that every semantic category (e.g., \texttt{GEAR}, \texttt{BRACKET}) possesses sufficient geometric variance to force the Transformer to learn a generalized representation of the object type, rather than memorizing a handful of outliers.
 				
+				\skiplines{1}
+				
+				While modern deep learning often favors massive dataset scale, this research applies the \textbf{Less Is More for Alignment (LIMA)} principle \parencite{lima_zhou}. The LIMA framework posits that if a base model possesses sufficient generalized intelligence, domain adaptation requires data \textit{quality} and \textit{density} rather than sheer volume. 
+
+				\skiplines{1}
+								
+				Consequently, instead of brute-forcing the model with 100,000 noisy, unverified CAD files, the dataset is aggressively filtered down to a highly curated, ultra-high-fidelity subset of $N=2,500$ geometrically dense STEP files. Because each file is unrolled into a complex multi-node graph, these 2,500 files contain millions of distinct geometric relationships. By training exclusively on verified, high-quality data, the model converges on the complex mapping between Stream B mathematics and Stream A semantics without memorizing the spurious noise and hallucinated annotations prevalent in scraped datasets.
+				
 			\end{indentedblock}
 	
 		\subsubsection{Dataset Standardization and Annotation Format}
@@ -141,7 +149,7 @@
 				
 				\skiplines{1}
 				
-				To validate the quality of the human-generated descriptions, a blind cross-verification study was conducted. A senior domain expert will be assigned to review a random sample of $N=500$ annotated descriptions, rating them as either "Compliant" or "Non-Compliant" based on the style guide. The consistency of this quality control process was measured using \textbf{Inter-Rater Reliability (IRR)}, specifically \textbf{'s Kappa ($\kappa$)} \parencite{kappa_cohen}. This metric was chosen over simple percent agreement to robustly account for the possibility of chance agreement, with a target threshold of $\kappa > 0.80$ established to certify the dataset's reliability for training the transformer model \parencite{kappa_landis}. Details of the equation can be seen in \autoref{sec:irr}.
+				To validate the quality of the human-generated descriptions, a blind cross-verification study was conducted. A senior domain expert will be assigned to review a random sample of $N=100$ annotated descriptions, rating them as either "Compliant" or "Non-Compliant" based on the style guide. The consistency of this quality control process was measured using \textbf{Inter-Rater Reliability (IRR)}, specifically \textbf{'s Kappa ($\kappa$)} \parencite{kappa_cohen}. This metric was chosen over simple percent agreement to robustly account for the possibility of chance agreement, with a target threshold of $\kappa > 0.80$ established to certify the dataset's reliability for training the transformer model \parencite{kappa_landis}. Details of the equation can be seen in \autoref{sec:irr}.
 			\end{indentedblock}
 			
 	\begin{figure}[H]
@@ -310,7 +318,9 @@
 	
 		\subsubsection{Pre-trained Decoder Backbone}
 			\begin{indentedblock}{4em}{0pt}
-				A decoder-only Transformer pre-trained on large-scale English corpora is employed to provide the model with inherent knowledge of grammar, syntax, and technical vocabulary. To adapt this model for CAD interpretation without destroying its pre-trained weights, this study utilizes \textbf{Vocabulary Expansion} and \textbf{Low-Rank Adaptation (LoRA)}.
+				Industrial STEP files are dense topological graphs; even after Semantic Macro-Compression, complex mechanical assemblies frequently exceed the standard 1024-token limit of legacy language models (e.g., GPT-2). This strict limit forces sequence truncation, depriving the model of critical global geometry before generation begins. 
+				
+				To resolve this architectural bottleneck, A decoder-only Transformer pre-trained on large-scale English corpora is employed to provide the model with inherent knowledge of grammar, syntax, and technical vocabulary. In particular, this research utilizes \textbf{Qwen 3.5B} as the pre-trained decoder backbone. Qwen provides a massive native context window (up to 32,000 tokens) and demonstrates superior zero-shot spatial reasoning and coding capabilities without a significant increase in memory and compute requirements. Rather than training from scratch, this study employs an \textbf{Architectural Adaptation} strategy. To adapt this model for CAD interpretation without destroying its pre-trained weights, this study utilizes \textbf{Vocabulary Expansion} and \textbf{Low-Rank Adaptation (LoRA)}.
 				
 				\begin{itemize}
 					\item \textbf{Vocabulary Expansion:} The model's embedding matrix is resized to accommodate the custom geometric tokens (e.g., \texttt{[GEO\_START]}, \texttt{<CYLINDER>}).
@@ -320,7 +330,7 @@
 						E_{\text{input}} = E_{\text{semantic}}(t) + (V_{\text{complex}} \cdot W_p)
 					\end{equation}
 					
-					where $E_{\text{semantic}}(t)$ is the 512-dimensional pre-trained word embedding representing the semantic meaning of the token at index $t$, $V_{\text{complex}}$ is the 128-dimensional complex-valued vector from the tokenizer's geometric stream, and $W_p$ is the learnable linear projection matrix that maps the geometric vector into the model's dimension ($128 \to 512$).
+					where $E_{\text{semantic}}(t)$ is the 512-dimensional pre-trained word embedding representing the semantic meaning of the token at index $t$, $V_{\text{complex}}$ is the 128-dimensional complex-valued vector from the tokenizer's geometric stream, and $W_p$ is the learnable linear projection matrix that maps the geometric vector into the model's token dimensions.
 				\end{itemize}
 			\end{indentedblock}
 	
@@ -381,7 +391,7 @@
 		
 		\subsubsection{Parameter-Efficient Dual-Stream Fine-Tuning}
 			\begin{indentedblock}{4em}{0pt}
-				The training phase leverages a Parameter-Efficient Fine-Tuning (PEFT) strategy to adapt the base Large Language Model (e.g., GPT-2) to the specialized task of B-Rep annotation without requiring full-parameter updates. The custom architecture, denoted as \mintinline{python}{GeometricSemanticModel}, 
+				The training phase leverages a Parameter-Efficient Fine-Tuning (PEFT) strategy to adapt the base Large Language Model to the specialized task of B-Rep annotation without requiring full-parameter updates. The custom architecture, denoted as \mintinline{python}{GeometricSemanticModel}, 
 				effectively fuses the discrete text tokens and the continuous geometric data.
 				
 				\skiplines{1}
@@ -443,7 +453,7 @@
 						\label{sec:irr}
 						The metric involves a manual review process where human experts verify a subset of generations against the 3D geometry. It explicitly identifies hallucinations in the model's output which are not present in the ground truth annotations and serves as the final quality check for the model.
 						
-						To evaluate the hallucination error—instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent from the B-Rep data—a manual review protocol is utilized. The reliability of the generated descriptions against human expert judgment is quantified using Cohen's Kappa ($\kappa$) which denotes the robust agreement score ranging from $-1$ to $1$. A $\kappa$ score $> 0.80$ indicates substantial reliability of the expert's verification:
+						A manual review protocol is utilized to prevent physical hallucinations, namely instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent from the B-Rep data. Due to the high cognitive load required to mentally reconstruct and verify complex B-Rep topology against text, the evaluation utilizes a \textbf{Stratified Random Sample} generation-geometry pairs. In specialized domains requiring expert-level annotation, massive sample sizes (e.g., $N > 500$) frequently introduce annotator fatigue, degrading the reliability of the ground truth \parencite{deep_learning_goodfellow}. A meticulously reviewed, stratified sample of $N=100$ ensures high-fidelity human validation while proportionally covering the major macro-classes (e.g., fasteners, gears, brackets) present in the dataset. The reliability of the generated descriptions against human expert judgment is quantified using Cohen's Kappa ($\kappa$) which denotes the robust agreement score ranging from $-1$ to $1$. A $\kappa$ score $> 0.80$ indicates substantial reliability of the expert's verification:
 						
 						\begin{equation}
 							\kappa = \frac{p_o - p_e}{1 - p_e}
@@ -460,6 +470,7 @@
 						\end{equation}
 						
 						where $N$ is the total number of sampled generation-geometry pairs evaluated during the manual review, $C$ is the number of discrete classification categories (for a binary hallucination check, $C = 2$, representing "Pass" and "Fail"), $n_{ii}$ represents the number of instances where both the model's output and the human rater agreed on category $i$ (the main diagonal of the confusion matrix). $n_{i+}$ is the marginal total of instances where the model's output corresponded to category $i$, and $n_{+i}$ is the marginal total of instances that the human expert explicitly classified as category $i$.
+						
 					\end{indentedblock}				
 				For each of the quantitative metrics listed, a minimum threshold is determined as a way to measure the quality of the model's results. For instance, the model ideally results in a BLEU-4 score $> 0.4$ to closely match Human-to-Human results \parencite{wu_google_translate}. The minimum threshold for ROUGE-L is set to be $> 0.35$ to ensure the model does not omit necessary details of the model from the annotation \parencite{lin_rouge}. Lastly, an ideal BERTScore threshold of $> 0.85$ is chosen since it measures the similarity in meaning between 2 sentences \parencite{bertscore_zhang}. A brief summary of each evaluation metric can be seen in \autoref{tab:evaluation-metrics}.
 				
@@ -499,11 +510,24 @@
 						Human Verification (IRR)
 						& \textbf{Focus: Hallucination Rate} \newline
 						A manual review process where human experts verify a subset of generations against the 3D geometry.
-						& Identifies \textbf{hallucinations}—instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent. \\
+						& Identifies \textbf{hallucinations} or faulty outputs where the model generates plausible-sounding features (e.g., "threaded") that aren't accurate to the object. \\
 						
 					\end{tblr}
 					\label{tab:evaluation-metrics}
 				\end{table}
+				
+			\end{indentedblock}
+		\subsubsection{Extended Evaluation and Testing Protocol}
+			\begin{indentedblock}{4em}{0pt}
+				To ensure the model is both mathematically accurate and computationally viable for real-world engineering applications, the evaluation protocol extends beyond standard semantic benchmarks. The following secondary metrics are calculated during the testing phase:
+				
+				\begin{enumerate}
+					\item \textbf{Topological Compression Ratio:} To quantify the efficiency of Stage 3 (Semantic Macro-Compression), the average percentage reduction in sequence length (total nodes and edges) is calculated between the raw B-Rep graphs and the compressed macros. This verifies the tokenizer's ability to maximize the transformer's effective receptive field.
+					
+					\item \textbf{Attention Ablation Study:} To mathematically isolate the performance gains provided by the custom Dual-Stream architecture, an ablation study is conducted. The model's baseline BLEU and BERTScore are evaluated \textit{without} the injection of the geometric vectors (Stream B) and Rotary Positional Encodings (RoPE), and then compared against the full architecture.
+					
+					\item \textbf{Inference Efficiency and Hardware Utility:} Practical deployment requires reasonable latency. The evaluation tracks \textbf{Tokens per Second (TPS)}, \textbf{Peak VRAM Usage}, and \textbf{Average Generation Latency} (in seconds) required to generate a complete L1-L3 hierarchical annotation for a complex assembly.
+				\end{enumerate}
 				
 			\end{indentedblock}
 		\subsubsection{BLEU vs BERTScore}
