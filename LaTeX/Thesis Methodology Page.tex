@@ -267,6 +267,14 @@
 						<FILLET\_CHAIN> 
 						& Sequences of adjacent toroidal or advanced faces blending sharp transitions. 
 						& Fillets are aesthetically and structurally important but semantically trivial. Compressing them prevents the token sequence from being dominated by edge-blending data. \\
+						
+						<PLANAR_PAD> 
+						& A flat PLANE bounded by an EDGE_LOOP, where every edge in the loop connects perpendicularly to a surrounding "skirt" of \texttt{<PLANE>} or \texttt{<CYLINDRICAL_SURFACE>} nodes. 
+						& Planar pads are used to isolate functional mounting interfaces from the primary structural body, allowing the model to prioritize high-torque or high-precision contact zones during semantic classification. \\
+						
+						<ANNOTATE> 
+						& Marker for output generation phase. 
+						& Acts as the critical transition token that terminates the Geometric Dual-Stream input and signals the Transformer to begin the autoregressive generation of the human-readable annotation sequence. \\
 					\end{tblr}
 					\label{tab:macro-tokens}
 				\end{table}
