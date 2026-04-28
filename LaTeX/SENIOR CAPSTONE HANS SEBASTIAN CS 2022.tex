@@ -1,12 +1,19 @@
 \documentclass[12pt,a4paper]{extreport}
+%top=0.59in,      
+%bottom=0.98in,   
+%headheight=15bp,  
+%headsep=1cm,
+%footskip=0.5cm
 \usepackage[
-left=4cm,   
-top=3cm,     
-right=3cm,   
-bottom=3cm,  
-headheight=15pt,  
-headsep=1cm,
-footskip=0.5cm
+left=1.58in,   
+right=1.18in,    
+includehead=true,
+includefoot=true,
+top=0.59in,      % LO Top Margin
+bottom=0.98in,   % LO Bottom Margin
+headheight=0.04in, % LO uses 0.04" with "AutoFit". 15bp is the safe LaTeX equivalent.
+headsep=0.55in,  % LO Header Spacing
+footskip=0.20in  % LO Footer Spacing (0.16") + Footer Height (0.04")
 ]{geometry}
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
@@ -26,6 +33,7 @@ sorting=nyt]{biblatex}
 \usepackage{subcaption}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{calc}
 \usepackage{amssymb}
 \usepackage{array}
 \usepackage{caption}
@@ -50,14 +58,29 @@ sorting=nyt]{biblatex}
 \usepackage{tocloft}
 \usepackage{xstring}
 \usepackage{svg}
+\usepackage[normalem]{ulem}
 \usepackage[export]{adjustbox}
+\usepackage{wrapfig}    % CRITICAL: For placing images with precise text wrapping.
+\usepackage{mdframed}  % CRITICAL: For creating dimensioned and bordered boxes.
 
 \newcommand{\mathhl}[2]{\colorbox{#1}{$\displaystyle#2$}}
 
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
 \newcolumntype{N}{@{}m{0pt}@{}}
 
+\makeatletter
+\renewcommand{\normalsize}{%
+	% 12bp font size, 13.73bp base line height
+	\@setfontsize\normalsize{12bp}{13.73bp}%
+	\abovedisplayskip 12bp \@plus3bp \@minus7bp
+	\abovedisplayshortskip \z@ \@plus3bp
+	\belowdisplayshortskip 6.5bp \@plus3.5bp \@minus3bp
+	\belowdisplayskip \abovedisplayskip
+	\let\@listi\@listI
+}
+\makeatother
 \setcounter{secnumdepth}{4}
+\setlength{\ULdepth}{1.25bp}
 
 \newcommand{\TITLE}{STEP File Tokenizer for Transformer-based Annotation} 
 \newcommand{\AUTHOR}{Hans Sebastian} 
@@ -66,16 +89,20 @@ sorting=nyt]{biblatex}
 \newcommand{\FACULTY}{Faculty of Engineering and Technology} 
 \newcommand{\SUPERVISORONE}{Panji Darma. Ph.D}
 \newcommand{\SUPERVISORTWO}{Supervisor 2 Name with title}
+\newcommand{\EXAMINERONE}{Examiner 1 Full Name with title}
+\newcommand{\EXAMINERTWO}{Examiner 2 Full Name with title}
 \newcommand{\SHORTTITLE}{STEP File Classification}
 \newcommand{\SHORTFACULTY}{FET}
 \newcommand{\UNIVERSITY}{Sampoerna University}
 
 \renewcommand{\sectionautorefname}{Section}
-\renewcommand{\abstractname}{\fontsize{14pt}{1.5\baselineskip}\selectfont ABSTRACT\vspace*{\baselineskip}}
+%\renewcommand{\abstractname}{\fontsize{14pt}{1.5\baselineskip}\selectfont ABSTRACT\vspace*{\baselineskip}}
+\renewcommand{\abstractname}{} 
+
 \defbibheading{references_head}{%
 	\begin{center}
-		\fontsize{14pt}{21pt}\selectfont \textbf{REFERENCES}\par
-		\vspace{21pt}
+		\fontsize{14bp}{21bp}\selectfont \textbf{REFERENCES}\par
+		\vspace{21bp}
 	\end{center}%
 }
 
@@ -90,25 +117,35 @@ sorting=nyt]{biblatex}
 \fancyhf{} % Clear all defaults
 \renewcommand{\headrulewidth}{0pt} % Remove header line
 \renewcommand{\footrulewidth}{0pt}
-\fancyfoot[C]{
-	\textbf{\thepage} \\
-	\hfill\break
-	\scriptsize \SHORTTITLE \dots \AUTHOR, \SHORTFACULTY, \the\year{}}
-\fancyfoot[R]{%
-	\hfill\break
-	\footnotesize \textbf{\UNIVERSITY}
+
+\fancyfoot[C]{%
+	\parbox{\textwidth}{%
+		% 1. Page Number (Centered)
+		\centering \thepage\par
+		
+		% 2. Skips exactly one line (1 baselineskip)
+%		\vspace{\baselineskip} 
+		
+		% 3. University Name (Right-aligned, Footnotesize)
+		{\raggedleft \footnotesize \textbf{\UNIVERSITY}\par}
+		
+		% 4. Title String (Centered, Scriptsize)
+		{\centering \fontsize{9bp}{\baselineskip}\selectfont \SHORTTITLE \dots \AUTHOR, \SHORTFACULTY, \the\year{}\par}
+	}%
 }
+
+% Apply the exact same setup to the 'plain' style (used on chapter/starting pages)
 \fancypagestyle{plain}{
 	\fancyhf{}
-	\renewcommand{\headrulewidth}{0pt} % Remove header line
+	\renewcommand{\headrulewidth}{0pt}
 	\renewcommand{\footrulewidth}{0pt}
-	\fancyfoot[C]{
-		\textbf{\thepage} \\
-		\hfill\break
-		\scriptsize \SHORTTITLE \dots \AUTHOR, \SHORTFACULTY, \the\year{}}
-	\fancyfoot[R]{%
-		\hfill\break
-		\footnotesize \textbf{\UNIVERSITY}
+	\fancyfoot[C]{%
+		\parbox{\textwidth}{%
+			\centering \thepage\par
+%			\vspace{\baselineskip} 
+			{\raggedleft \footnotesize \textbf{\UNIVERSITY}\par}
+			{\centering \fontsize{9bp}{\baselineskip}\selectfont \SHORTTITLE \dots \AUTHOR, \SHORTFACULTY, \the\year{}\par}
+		}%
 	}
 }
 
@@ -136,39 +173,40 @@ sorting=nyt]{biblatex}
 }}
 
 \titleformat{\chapter}[display]
-	{\normalfont\bfseries\centering\fontsize{14pt}{14pt}\selectfont} % Format for the whole title block: normal, huge, bold, centered
+	{\normalfont\bfseries\centering\fontsize{14bp}{14bp}\selectfont} % Format for the whole title block: normal, huge, bold, centered
 	{CHAPTER \thechapter}
 	{1em}                                 % Vertical space between the label and the title
 	{\MakeUppercase}                       % Code applied to the title text itself (e.g., "LITERATURE REVIEW")
 
 \titleformat{\section}
-	{\normalfont\bfseries\fontsize{12pt}{15pt}\selectfont}
+	{\normalfont\bfseries\fontsize{12bp}{15bp}\selectfont}
 	{\thesection}
 	{1em}
 	{}
 
 \titleformat{\subsection}
-	{\normalfont\bfseries\fontsize{12pt}{15pt}\selectfont}
+	{\normalfont\bfseries\fontsize{12bp}{15bp}\selectfont}
 	{\thesubsection}
 	{1em}
 	{}
 
 \titleformat{\subsubsection}
-	{\normalfont\bfseries\fontsize{12pt}{15pt}\selectfont}
+	{\normalfont\bfseries\fontsize{12bp}{15bp}\selectfont}
 	{\thesubsubsection}
 	{1em}
 	{}
 	
 \titleformat{\paragraph}
-	{\normalfont\bfseries\fontsize{12pt}{15pt}\selectfont}
+	{\normalfont\bfseries\fontsize{12bp}{15bp}\selectfont}
 	{\theparagraph}
 	{1em}
 	{}
 	
 \titlespacing*{\chapter}
 	{0pt}                   % Left margin
-	{-15pt}                   % Vertical space BEFORE title (Set to 0pt to hit the top margin)
-	{14pt}                  % Vertical space AFTER title (Adjust this to match your Word doc)
+	{-21bp}
+%	{-15bp}                   % Vertical space BEFORE title (Set to 0pt to hit the top margin)
+	{14bp}                  % Vertical space AFTER title (Adjust this to match your Word doc)
 
 \titlespacing{\subsection}
 	{2em} % 1. Left margin indentation
@@ -201,20 +239,24 @@ sorting=nyt]{biblatex}
 \begin{document}
 	\input{Thesis Title Page.tex}
 	\input{Thesis Supervisor Signature Page.tex}
+	\pagenumbering{roman}
+	\input{Thesis Examiner Board Approval.tex}
 	\addimage
 	\input{Thesis Declaration of Originality.tex}
 	\input{Thesis Exclusive Right Statement.tex}
 	\input{Thesis Acknowledgement.tex}
+	\input{Thesis Abstract Page.tex}
 	% Print table of contents
 	\input{Thesis Tables.tex}
 
-	\input{Thesis Abstract Page.tex}
+	\pagenumbering{arabic}
 	\input{Thesis Introduction Page.tex}
 	\input{Thesis Literature Review Page.tex}
 	\input{Thesis Methodology Page.tex}
 
 	\input{Thesis Results and Discussion Page.tex}
 %   \input{Thesis Conclusion Page.tex}
+	\input{Thesis Biography Author Page Template.tex}
 	\pagebreak
 	\printbibliography[heading=references_head]
 \end{document}

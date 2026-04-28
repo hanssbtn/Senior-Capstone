@@ -1,21 +1,28 @@
+\clearpage
 \begingroup
-\thispagestyle{empty}
 
-\begin{abstract}
-	\noindent % Prevents paragraph indentation
-	\begin{tabular}{@{}p{3.5cm} @{}c@{ } p{10cm}@{}} % @{} removes extra padding on edges
-		Full Name      & : & \AUTHOR \\[8pt]
-		Study Program  & : & \STUDYPROGRAM \\[8pt]
-		Title          & : & \TITLE \\[8pt]
-		Supervisor     & : & \SUPERVISORONE \\[8pt]
-	\end{tabular}
-	\skiplines{1.5}
-	
-	\noindent The abstract should be informative and completely self-explanatory, provide a clear statement of the problem, the proposed approach or solution, and point out major findings and conclusions. The abstract should be 500 words in length. 
-	
-	\skiplines{1}
-	
-	\noindent \textbf{Keywords:} \textit{...}
-\end{abstract}
+\phantomsection % Ensures the PDF bookmark points to the exact top of the page
+\addcontentsline{toc}{chapter}{ABSTRACT} % Adds 'ABSTRACT' to the ToC
+\begin{center}
+	\fontsize{14bp}{1.5\baselineskip}\selectfont \textbf{ABSTRACT}
+\end{center}
+\vspace{1.5\baselineskip} % Exact 1.5 line spacing gap
 
+% 3. The tabular info section
+\noindent
+\begin{tabular}{@{}p{3.5cm} @{}c@{ } p{10.5cm}@{}}
+	Full Name      & : & \AUTHOR \\[8pt]
+	Study Program  & : & \STUDYPROGRAM \\[8pt]
+	Title          & : & \TITLE \\[8pt]
+	Supervisor     & : & \SUPERVISORONE 
+\end{tabular}
+\skiplines{1.5}
+
+
+\noindent The abstract should be informative and completely self-explanatory, provide a clear statement of the problem, the proposed approach or solution, and point out major findings and conclusions. The abstract should be 500 words in length. 
+
+\skiplines{1}
+
+\noindent \textbf{Keywords:} \textit{...}
 \endgroup
+\pagebreak

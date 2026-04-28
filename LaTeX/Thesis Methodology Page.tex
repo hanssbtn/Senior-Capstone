@@ -2,7 +2,7 @@
 \chapter[]{METHODOLOGY}
 \renewcommand{\thechapter}{\arabic{chapter}}
 \begingroup
-\fontsize{12pt}{\baselineskip}\selectfont
+\fontsize{12bp}{\baselineskip}\selectfont
 \section{Data Gathering}
 	Training a descriptive model effectively necessitates a large-scale, high-fidelity dataset that pairs geometric representations with semantic natural language. However, unlike 2D image-captioning domains, the 3D CAD landscape suffers from a significant scarcity of standardized, human-readable annotations. A comprehensive data acquisition framework was developed to handle the sparse data availability. The procedure involves ingesting raw geometric data, filtering for quality and file size, and semantically enrich samples through a hybrid HITL process. A summary of the dataset preprocessing steps can be seen in \autoref{fig:dataset-acquisition-and-filtering-flowchart}.
 	
@@ -15,7 +15,7 @@
 			\begin{table}[H]
 				\centering
 				\caption{Comparison of CAD Dataset Sources.}
-				\fontsize{10pt}{1\baselineskip}\selectfont
+				\fontsize{10bp}{1\baselineskip}\selectfont
 				\begin{tblr}{
 						width=\linewidth, % Forces table to be as wide as the page
 						colspec={
@@ -233,7 +233,7 @@
 				\begin{table}[H]
 					\centering
 					\caption{Defined Semantic Macro Tokens and Topological Justifications}
-					\fontsize{10pt}{1\baselineskip}\selectfont
+					\fontsize{10bp}{\baselineskip}\selectfont
 					\begin{tblr}{
 							width=\linewidth,
 							colspec={
@@ -268,8 +268,8 @@
 						& Sequences of adjacent toroidal or advanced faces blending sharp transitions. 
 						& Fillets are aesthetically and structurally important but semantically trivial. Compressing them prevents the token sequence from being dominated by edge-blending data. \\
 						
-						<PLANAR_PAD> 
-						& A flat PLANE bounded by an EDGE_LOOP, where every edge in the loop connects perpendicularly to a surrounding "skirt" of \texttt{<PLANE>} or \texttt{<CYLINDRICAL_SURFACE>} nodes. 
+						<PLANAR\_PAD> 
+						& A flat PLANE bounded by an EDGE\_LOOP, where every edge in the loop connects perpendicularly to a surrounding "skirt" of \texttt{<PLANE>} or \texttt{<CYLINDRICAL\_SURFACE>} nodes. 
 						& Planar pads are used to isolate functional mounting interfaces from the primary structural body, allowing the model to prioritize high-torque or high-precision contact zones during semantic classification. \\
 						
 						<ANNOTATE> 
@@ -485,7 +485,7 @@
 				\begin{table}[H]
 					\centering
 					\caption{Summary of Evaluation Metrics for Geometric Captioning}
-					\fontsize{12pt}{1\baselineskip}\selectfont
+					\fontsize{12bp}{1\baselineskip}\selectfont
 					\begin{tblr}{
 							width=\linewidth,
 							colspec={

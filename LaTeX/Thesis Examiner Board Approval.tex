@@ -1,0 +1,61 @@
+\phantomsection % Ensures the PDF bookmark points to the exact top of the page
+\addcontentsline{toc}{chapter}{EXAMINER BOARD APPROVAL} % Adds 'EXAMINER BOARD APPROVAL' to the ToC
+\begin{center}
+	\fontsize{14bp}{1.5\baselineskip}\selectfont
+	\textbf{EXAMINER BOARD APPROVAL}
+\end{center}
+\begin{justify}
+	\noindent % Prevents paragraph indentation
+	\begin{tabular}{@{}p{4.5cm} @{}c@{ } p{10cm}@{}} % @{} removes extra padding on edges
+		Name of Student           & : & \AUTHOR \\
+		Student ID Number         & : & \STUDENTID \\
+		Study Program             & : & \STUDYPROGRAM \\
+		Faculty                   & : & \FACULTY \\
+		Final Year Project Title  & : & \TITLE \\
+		                          &   & \\
+		                          &   & \\
+	\end{tabular}
+	
+	\noindent has been successfully defended in front of the Board of Examiner in partial
+	fulfillment of the requirements for Bachelor of (title degree) in \STUDYPROGRAM,
+	\FACULTY, in Jakarta, \today.
+	
+	\skiplines*{1}	
+	
+	\noindent
+	\textbf{Board of Examiners}
+	
+	\skiplines*{1}
+	
+	\noindent
+	\begin{tabular}{ @{\hspace{\widthof{B}}}p{4.5cm}  >{\centering\arraybackslash}p{10cm} @{}}
+		Examiner 1 & 
+		\vspace{0pt} % Trick: Sets the baseline to the top so "Examiner 1" stays up
+		\skiplines*{2}
+		\textcolor{gray}{(wet ink signature)} \par
+		\skiplines*{1}
+		\uline{\EXAMINERONE} \par
+		\skiplines*{1} \\ 
+		Examiner 2 & 
+		\vspace{0pt} 
+		\skiplines*{2} 
+		\textcolor{gray}{(wet ink signature)} \par
+		\skiplines*{1}
+		\uline{\EXAMINERTWO} \par
+		\skiplines*{2} \\
+		Supervisor 1 & 
+		\vspace{0pt} 
+		\skiplines*{2} 
+		\textcolor{gray}{(wet ink signature)} \par
+		\skiplines*{1}
+		\uline{\SUPERVISORONE} \par
+		\skiplines*{1} \\
+		Supervisor 2 & 
+		\vspace{0pt} 
+		\skiplines*{2} 
+		\textcolor{gray}{(wet ink signature)} \par
+		\skiplines*{1}
+		\uline{\SUPERVISORTWO} \par
+	\end{tabular}
+\end{justify}
+\pagebreak

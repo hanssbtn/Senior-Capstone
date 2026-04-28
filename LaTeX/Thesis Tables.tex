@@ -5,7 +5,7 @@
 \settowidth{\dotwidth}{.}
 
 \makeatletter
-\renewcommand{\contentsname}{\hfill\bfseries\fontsize{14pt}{1.5\baselineskip}\selectfont TABLE OF CONTENTS\hfill}
+\renewcommand{\contentsname}{\hfill\bfseries\fontsize{14bp}{1.5\baselineskip}\selectfont TABLE OF CONTENTS\hfill}
 
 \renewcommand{\cftaftertoctitleskip}{\baselineskip}
 \renewcommand{\cftdotfill}[1]{%
@@ -57,7 +57,7 @@
 \counterwithout{table}{chapter}
 \counterwithout{equation}{chapter}
 
-\renewcommand{\listfigurename}{\hfill\bfseries\fontsize{14pt}{1.25\baselineskip}\selectfont LIST OF FIGURES\hfill}
+\renewcommand{\listfigurename}{\hfill\bfseries\fontsize{14bp}{1.25\baselineskip}\selectfont LIST OF FIGURES\hfill}
 \renewcommand{\cftfigindent}{0pt}
 % 2. Add "Figure " prefix
 \renewcommand{\cftfigpresnum}{Figure }
@@ -69,14 +69,14 @@
 % 4. Adjust page number alignment (optional, ensures they stay right-aligned)
 \renewcommand{\cftfigafterpnum}{\par}
 
-\renewcommand{\listtablename}{\hfill\bfseries\fontsize{14pt}{1.25\baselineskip}\selectfont LIST OF TABLES\hfill}
+\renewcommand{\listtablename}{\hfill\bfseries\fontsize{14bp}{1.25\baselineskip}\selectfont LIST OF TABLES\hfill}
 \renewcommand{\cfttabindent}{0pt}
 \renewcommand{\cfttabpresnum}{Table }
 \settowidth{\cfttabnumwidth}{Table 000} % Adjust width to fit the prefix
 
 \renewcommand{\cfttableader}{\hfill}
 
-\newlistof{formulas}{eqs}{\hfill\bfseries\fontsize{14pt}{1.25\baselineskip}\selectfont LIST OF FORMULAS\hfill}
+\newlistof{formulas}{loe}{\hfill\bfseries\fontsize{14bp}{1.25\baselineskip}\selectfont LIST OF FORMULAS\hfill}
 %
 \setlength{\cftformulasindent}{0pt}
 \renewcommand{\cftformulaspresnum}{(}
@@ -85,8 +85,13 @@
 \renewcommand{\cftformulasleader}{\hfill}
 \renewcommand{\cftformulasafterpnum}{\par}
 
+\setlength{\cftbeforetoctitleskip}{-21bp}       % Pulls up ToC
+\setlength{\cftbeforeloftitleskip}{-21bp}       % Pulls up LoF
+\setlength{\cftbeforelottitleskip}{-21bp}       % Pulls up LoT
+\setlength{\cftbeforeloetitleskip}{-21bp}  % Pulls up your custom Formulas list
+
 \newcommand{\addformula}[1]{%
-	\addcontentsline{eqs}{formulas}{\protect\numberline{\theequation}#1}%
+	\addcontentsline{loe}{formulas}{\protect\numberline{\theequation}#1}%
 }
 
 \begingroup

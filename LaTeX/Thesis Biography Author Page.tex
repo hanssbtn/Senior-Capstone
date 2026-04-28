@@ -1,0 +1,53 @@
+\clearpage % Reset page
+% Title 
+\phantomsection
+\begin{center}
+	\fontsize{14bp}{1.5\baselineskip}\selectfont
+	\textbf{BIOGRAPHY AUTHOR}
+\end{center}
+\skiplines{2.5}
+\fontsize{12bp}{20.595bp}\selectfont
+
+\addcontentsline{toc}{chapter}{BIOGRAPHY AUTHOR} % Adds 'BIOGRAPHY AUTHOR TO TABLE OF CONTENTS
+
+% --- Dimension Calculations ---
+% If you ever get a "Command already defined" error on these lengths in the future, 
+% just move these \newlength lines into your main.tex preamble!
+% --- Dimension Calculations ---
+\newlength{\photoW}\setlength{\photoW}{3cm}
+\newlength{\photoH}\setlength{\photoH}{4cm}
+\newlength{\borderThickness}\setlength{\borderThickness}{0.01in}
+\newlength{\LRspacing}\setlength{\LRspacing}{0.15in}
+
+\newlength{\boxPadding}\setlength{\boxPadding}{0.1in}
+\newlength{\contentW}\setlength{\contentW}{\photoW - 2\boxPadding}
+\newlength{\contentH}\setlength{\contentH}{\photoH}
+
+\setlength{\columnsep}{\LRspacing}
+{
+	\hyphenpenalty=10000
+	\exhyphenpenalty=10000
+	% --- The Wrapped Photo Box ---
+	\begin{wrapfigure}[6]{l}{\photoW}
+		\vspace*{-19.2bp}% Keeps the top aligned with the text baseline
+		% The bordered photo box
+		\begin{minipage}[t][\photoH][t]{\photoW}
+			\begin{mdframed}[linecolor=black,
+				linewidth=\borderThickness,
+				innertopmargin=0pt, innerbottommargin=0pt,
+				innerleftmargin=\boxPadding, innerrightmargin=0pt,
+				skipabove=0pt, skipbelow=0pt]
+				\begin{minipage}[c][\contentH][c]{\contentW}
+					\vspace{0pt}
+					\fontsize{10bp}{12bp}\selectfont\itshape
+					Please attach a clear, formal photo (3x4 cm) with white background and brief vita
+				\end{minipage}
+			\end{mdframed}
+		\end{minipage}
+	\end{wrapfigure}
+	
+	% --- Biography Text ---
+	
+	\noindent iThis section provides a brief introduction of the author including the educational background, research interests, as well as correspondence contact. \\
+	\noindent Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin egestas eu nulla et iaculis. Duis at sapien a metus bibendum laoreet ac ac risus. Nulla sagittis, purus sed placerat dignissim, eros tortor dapibus quam, a rhoncus nisi libero a risus. Vivamus efficitur lectus at neque lobortis euismod. Aenean et orci non enim mollis dapibus sed id orci. Donec nec ligula id arcu sollicitudin efficitur nec ac mi. Aliquam vel vulputate tortor, non bibendum magna. Sed tincidunt euismod dolor, ac varius felis egestas nec. Proin pharetra accumsan arcu, nec finibus massa egestas ut. Nulla tincidunt gravida ullamcorper. (Font: Justify, Times New Roman, size 12, line spacing: 1.5 lines; before 0 pt, after 0 pt) \par
+}
