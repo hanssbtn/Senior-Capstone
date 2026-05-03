@@ -10,6 +10,8 @@
 *.lot
 *.out
 *.eqs
+*.minted
+*.pyg
 Code/secret.env
 Code/dataset/abc_0000_step_v00*
 Code/models/qwen2.5/model.safetensors
