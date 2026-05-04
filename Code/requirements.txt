@@ -17,6 +17,7 @@ rouge-score
 bert_score
 nltk
 bitsandbytes>=0.46.1
+qwen-vl-utils
 
 # --- CAD Processing (Specific for .step files) ---
 # CadQuery 2.7+ is required for Python 3.12 stability
@@ -24,6 +25,9 @@ cadquery
 cadquery-ocp
 pythonocc-core
 networkx
+pyvista
+trimesh 
+pyrender
 
 # --- Data Science ---
 pandas
