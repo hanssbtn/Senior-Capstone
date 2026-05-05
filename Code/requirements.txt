@@ -35,6 +35,6 @@ numpy
 matplotlib
 scikit-learn
 
-# Jupyter
-ipykernel
-ipywidgets
+# Jupyter (Uncomment if not installed and running locally)
+# ipykernel
+# ipywidgets
