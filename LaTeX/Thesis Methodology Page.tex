@@ -154,7 +154,7 @@
 			
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=1.2\linewidth, pagecenter]{"../Images/DATASET ACQUISITION AND FILTERING FLOWCHART"}
+		\includegraphics[width=\linewidth, pagecenter]{"../Images/DATASET ACQUISITION AND FILTERING FLOWCHART"}
 		\caption{Dataset acquisition and filtering flowchart}
 		\label{fig:dataset-acquisition-and-filtering-flowchart}
 	\end{figure}
@@ -283,12 +283,13 @@
 					\begin{indentedblock}{2em}{0pt}
 						Although collapsing subgraphs into macro tokens may significantly shorten the token sequence length, there are strict mathematical and computational constraints that prohibit the creation of an overly expansive macro dictionary (e.g., defining tokens for highly specific shapes like \texttt{<HEXAGONAL\_POCKET\_WITH\_CHAMFER>}). The reasons for limiting the macro tokens are threefold:
 						
+						\begin{sloppypar}
 						\begin{enumerate}
 							\item \textbf{Vocabulary Sparsity and Embedding Quality:} The transformer relies on statistical frequency to learn high-quality embeddings. If highly specific macros are defined, their occurrence across the dataset will be extremely rare (forming a long-tail distribution). This means that with the model lacks sufficient training samples to adequately adjust the vector weights for these rare tokens, leading to poor generalization.
 							\item \textbf{Loss of Compositional Flexibility:} Transformers inherently excel at compositional reasoning, which involves combining simple, foundational tokens to understand complex, novel objects. Over-compressing the graph into strict, pre-defined shapes removes the model's ability to interpret unique geometric variations that do not perfectly align with a programmed template.
 							\item \textbf{Computational Overhead of Subgraph Isomorphism:} The compression stage relies on Graph Isomorphism matching, which is historically an NP-complete problem. As the complexity of the templates and the size of the dictionary increase, the time required to parse and compress the raw B-Rep graphs scales exponentially. Limiting the macros to fundamental, highly frequent features guarantees that the data preprocessing remains computationally tractable.
 						\end{enumerate}
-						
+						\end{sloppypar}
 						The execution order of the macro-compression pipeline is strictly prioritized in descending order of topological complexity. The graph is scanned for composite manufacturing features (e.g., holes, chamfers, fillets) prior to isolated primitives (e.g., spheres, standalone cylinders), and concludes with foundational base features (e.g., planar surfaces). This hierarchical, greedy-matching strategy is necessary to prevent destructive interference during token compression. For instance, compressing primitive cylinders before holes will result in the internal cylindrical face of a drilled hole being prematurely collapsed into an isolated \texttt{<CYLINDER\_PRIMITIVE>}. Consequently, the broader \texttt{<THROUGH\_HOLE>} subgraph template would fail to match, incorrectly leaving the associated bounding circular edges and planar surfaces stranded in the sequence. 
 					\end{indentedblock}
 			\end{indentedblock}
@@ -456,32 +457,35 @@
 						where $x$ and $\hat{x}$ are the reference sequence (ground truth) and the candidate sequence (model output), $|x|$ and $|\hat{x}|$ represent the total number of tokens in the reference and candidate sequences. $\mathbf{x}_i$ and $\hat{\mathbf{x}}_j$ are the normalized, contextualized embedding vectors for the $i$-th token in the reference and the $j$-th token in the candidate sequences. $\mathbf{x}_i^\top \hat{\mathbf{x}}_j$ computes the cosine similarity (dot product) between the two embedding vectors. Lastly, the $\max$ denotes the greedy matching process, which pairs each token in one sentence to the single most semantically similar token in the other sentence.
 					\end{indentedblock}				
 				\paragraph{Human Verification (IRR)}
-				
+					
 					\begin{indentedblock}{4em}{0pt}
 						\label{sec:irr}
 						The metric involves a manual review process where human experts verify a subset of generations against the 3D geometry. It explicitly identifies hallucinations in the model's output which are not present in the ground truth annotations and serves as the final quality check for the model.
 						
-						A manual review protocol is utilized to prevent physical hallucinations, namely instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent from the B-Rep data. Due to the high cognitive load required to mentally reconstruct and verify complex B-Rep topology against text, the evaluation utilizes a \textbf{Stratified Random Sample} generation-geometry pairs. In specialized domains requiring expert-level annotation, massive sample sizes (e.g., $N > 500$) frequently introduce annotator fatigue, degrading the reliability of the ground truth \parencite{deep_learning_goodfellow}. A meticulously reviewed, stratified sample of $N=100$ ensures high-fidelity human validation while proportionally covering the major macro-classes (e.g., fasteners, gears, brackets) present in the dataset. The reliability of the generated descriptions against human expert judgment is quantified using Cohen's Kappa ($\kappa$) which denotes the robust agreement score ranging from $-1$ to $1$. A $\kappa$ score $> 0.80$ indicates substantial reliability of the expert's verification:
+						\begin{sloppypar}
+							A manual review protocol is utilized to prevent physical hallucinations, namely instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent from the B-Rep data. Due to the high cognitive load required to mentally reconstruct and verify complex B-Rep topology against text, the evaluation utilizes a \textbf{Stratified Random Sample} generation-geometry pairs. In specialized domains requiring expert-level annotation, massive sample sizes (e.g., $N > 500$) frequently introduce annotator fatigue, degrading the reliability of the ground truth \parencite{deep_learning_goodfellow}. A meticulously reviewed, stratified sample of $N=100$ ensures high-fidelity human validation while proportionally covering the major macro-classes (e.g., fasteners, gears, brackets) present in the dataset. The reliability of the generated descriptions against human expert judgment is quantified using Cohen's Kappa ($\kappa$) which denotes the robust agreement score ranging from $-1$ to $1$. A $\kappa$ score $> 0.80$ indicates substantial reliability of the expert's verification:
+							\begin{equation}
+								\kappa = \frac{p_o - p_e}{1 - p_e}
+							\end{equation}
+							
+							where $p_o$ is the relative observed agreement (the proportion of times the model's generated facts exactly match the human's binary assessment of the geometry), and $p_e$ is the hypothetical probability of chance agreement, calculated using the marginal probabilities of each rater's (or model's) classification frequencies. Each of these probabilities is mathematically derived from the evaluation confusion matrix as follows:
+							
+							\begin{equation}
+								p_o = \frac{1}{N} \sum_{i=1}^{C} n_{ii}
+							\end{equation}
+							
+							\begin{equation}
+								p_e = \frac{1}{N^2} \sum_{i=1}^{C} n_{i+} n_{+i}
+							\end{equation}
+							
+							where $N$ is the total number of sampled generation-geometry pairs evaluated during the manual review, $C$ is the number of discrete classification categories (for a binary hallucination check, $C = 2$, representing "Pass" and "Fail"), $n_{ii}$ represents the number of instances where both the model's output and the human rater agreed on category $i$ (the main diagonal of the confusion matrix). $n_{i+}$ is the marginal total of instances where the model's output corresponded to category $i$, and $n_{+i}$ is the marginal total of instances that the human expert explicitly classified as category $i$.
+								
+						\end{sloppypar}
 						
-						\begin{equation}
-							\kappa = \frac{p_o - p_e}{1 - p_e}
-						\end{equation}
-						
-						where $p_o$ is the relative observed agreement (the proportion of times the model's generated facts exactly match the human's binary assessment of the geometry), and $p_e$ is the hypothetical probability of chance agreement, calculated using the marginal probabilities of each rater's (or model's) classification frequencies. Each of these probabilities is mathematically derived from the evaluation confusion matrix as follows:
-						
-						\begin{equation}
-							p_o = \frac{1}{N} \sum_{i=1}^{C} n_{ii}
-						\end{equation}
-						
-						\begin{equation}
-							p_e = \frac{1}{N^2} \sum_{i=1}^{C} n_{i+} n_{+i}
-						\end{equation}
-						
-						where $N$ is the total number of sampled generation-geometry pairs evaluated during the manual review, $C$ is the number of discrete classification categories (for a binary hallucination check, $C = 2$, representing "Pass" and "Fail"), $n_{ii}$ represents the number of instances where both the model's output and the human rater agreed on category $i$ (the main diagonal of the confusion matrix). $n_{i+}$ is the marginal total of instances where the model's output corresponded to category $i$, and $n_{+i}$ is the marginal total of instances that the human expert explicitly classified as category $i$.
-						
-					\end{indentedblock}				
-				For each of the quantitative metrics listed, a minimum threshold is determined as a way to measure the quality of the model's results. For instance, the model ideally results in a BLEU-4 score $> 0.4$ to closely match Human-to-Human results \parencite{wu_google_translate}. The minimum threshold for ROUGE-L is set to be $> 0.35$ to ensure the model does not omit necessary details of the model from the annotation \parencite{lin_rouge}. Lastly, an ideal BERTScore threshold of $> 0.85$ is chosen since it measures the similarity in meaning between 2 sentences \parencite{bertscore_zhang}. A brief summary of each evaluation metric can be seen in \autoref{tab:evaluation-metrics}.
-				
+					\end{indentedblock}		
+							
+					For each of the quantitative metrics listed, a minimum threshold is determined as a way to measure the quality of the model's results. For instance, the model ideally results in a BLEU-4 score $> 0.4$ to closely match Human-to-Human results \parencite{wu_google_translate}. The minimum threshold for ROUGE-L is set to be $> 0.35$ to ensure the model does not omit necessary details of the model from the annotation \parencite{lin_rouge}. Lastly, an ideal BERTScore threshold of $> 0.85$ is chosen since it measures the similarity in meaning between 2 sentences \parencite{bertscore_zhang}. A brief summary of each evaluation metric can be seen in \autoref{tab:evaluation-metrics}.
+					
 				\begin{table}[H]
 					\centering
 					\caption{Summary of Evaluation Metrics for Geometric Captioning}
@@ -529,13 +533,15 @@
 			\begin{indentedblock}{4em}{0pt}
 				To ensure the model is both mathematically accurate and computationally viable for real-world engineering applications, the evaluation protocol extends beyond standard semantic benchmarks. The following secondary metrics are calculated during the testing phase:
 				
-				\begin{enumerate}
-					\item \textbf{Topological Compression Ratio:} To quantify the efficiency of Stage 3 (Semantic Macro-Compression), the average percentage reduction in sequence length (total nodes and edges) is calculated between the raw B-Rep graphs and the compressed macros. This verifies the tokenizer's ability to maximize the transformer's effective receptive field.
-					
-					\item \textbf{Attention Ablation Study:} To mathematically isolate the performance gains provided by the custom Dual-Stream architecture, an ablation study is conducted. The model's baseline BLEU and BERTScore are evaluated \textit{without} the injection of the geometric vectors (Stream B) and Rotary Positional Encodings (RoPE), and then compared against the full architecture.
-					
-					\item \textbf{Inference Efficiency and Hardware Utility:} Practical deployment requires reasonable latency. The evaluation tracks \textbf{Tokens per Second (TPS)}, \textbf{Peak VRAM Usage}, and \textbf{Average Generation Latency} (in seconds) required to generate a complete L1-L3 hierarchical annotation for a complex assembly.
-				\end{enumerate}
+				\begin{sloppypar}
+					\begin{enumerate}
+						\item \textbf{Topological Compression Ratio:} To quantify the efficiency of Stage 3 (Semantic Macro-Compression), the average percentage reduction in sequence length (total nodes and edges) is calculated between the raw B-Rep graphs and the compressed macros. This verifies the tokenizer's ability to maximize the transformer's effective receptive field.
+						
+						\item \textbf{Attention Ablation Study:} To mathematically isolate the performance gains provided by the custom Dual-Stream architecture, an ablation study is conducted. The model's baseline BLEU and BERTScore are evaluated \textit{without} the injection of the geometric vectors (Stream B) and Rotary Positional Encodings (RoPE), and then compared against the full architecture.
+						
+						\item \textbf{Inference Efficiency and Hardware Utility:} Practical deployment requires reasonable latency. The evaluation tracks \textbf{Tokens per Second (TPS)}, \textbf{Peak VRAM Usage}, and \textbf{Average Generation Latency} (in seconds) required to generate a complete L1-L3 hierarchical annotation for a complex assembly.
+					\end{enumerate}
+				\end{sloppypar}
 				
 			\end{indentedblock}
 		\subsubsection{BLEU vs BERTScore}
