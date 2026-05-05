@@ -23,7 +23,7 @@ qwen-vl-utils
 # CadQuery 2.7+ is required for Python 3.12 stability
 cadquery
 cadquery-ocp
-pythonocc-core
+# pythonocc-core
 networkx
 pyvista
 trimesh 
