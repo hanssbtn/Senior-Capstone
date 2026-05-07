@@ -1,0 +1,46 @@
+# ==========================================
+# 1. THE COLAB GUARDRAILS (CRITICAL)
+# Prevents pip from breaking the Jupyter UI
+# ==========================================
+ipython==7.34.0
+ipykernel==6.17.1
+tornado==6.5.1
+google-auth==2.47.0
+cryptography<44
+websockets<16.0
+fsspec==2025.3.0
+docutils<0.22
+
+# ==========================================
+# 2. COLAB-SAFE DATA SCIENCE BOUNDS
+# ==========================================
+pandas>=1.5.3,<3.0.0
+numpy<2.1
+pillow<12.0
+matplotlib
+scikit-learn
+
+# ==========================================
+# 3. LLM & THESIS RESEARCH STACK
+# ==========================================
+transformers[torch]
+peft
+accelerate>=1.3.0
+google-genai
+evaluate
+rouge-score
+bert_score
+nltk
+bitsandbytes>=0.46.1
+qwen-vl-utils
+
+# ==========================================
+# 4. CAD PROCESSING (.step files)
+# ==========================================
+# Note: pythonocc-core is handled by Micromamba
+cadquery
+cadquery-ocp
+networkx
+pyvista
+trimesh 
+pyrender
