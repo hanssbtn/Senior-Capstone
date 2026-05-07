@@ -1,0 +1,15 @@
+# --- LLM & Thesis Research Stack ---
+evaluate
+rouge-score
+bert_score
+bitsandbytes>=0.46.1
+qwen-vl-utils
+
+# --- CAD Processing (Specific for .step files) ---
+# CadQuery 2.7+ is required for Python 3.12 stability
+# Note: pythonocc-core is handled by Micromamba
+cadquery
+cadquery-ocp
+pyvista
+trimesh 
+pyrender
