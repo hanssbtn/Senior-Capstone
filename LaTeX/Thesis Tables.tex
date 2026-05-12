@@ -19,6 +19,9 @@
 \renewcommand{\cftchapleader}{\hspace{-\dotwidth}\bfseries\cftdotfill{\cftdotsep}}
 \renewcommand{\cftchappresnum}{CHAPTER }
 \renewcommand{\cftchapnumwidth}{6.5em}
+\setlength{\cftbeforechapskip}{8bp}
+\setlength{\cftbeforesecskip}{8bp}
+\setlength{\cftbeforesubsecskip}{8bp}
 \renewcommand{\cftchapfillnum}[1]{%
 	{\cftchapleader}\nobreak
 	{\cftchappagefont #1}
@@ -85,10 +88,13 @@
 \renewcommand{\cftformulasleader}{\hfill}
 \renewcommand{\cftformulasafterpnum}{\par}
 
+\newlistof{abbreviations}{loa}{\hfill\bfseries\fontsize{14bp}{1.25\baselineskip}\selectfont LIST OF ABBREVIATIONS\hfill}
+
 \setlength{\cftbeforetoctitleskip}{-21bp}       % ToC
 \setlength{\cftbeforeloftitleskip}{-21bp}       % LoF
 \setlength{\cftbeforelottitleskip}{-21bp}       % LoT
-\setlength{\cftbeforeloetitleskip}{-21bp}       % Formulas list
+\setlength{\cftbeforeloetitleskip}{-21bp}       % LoE
+\setlength{\cftbeforeloatitleskip}{-21bp}       % LoA
 
 \newcommand{\addformula}[1]{%
 	\addcontentsline{loe}{formulas}{\protect\numberline{\theequation}#1}%
@@ -107,13 +113,20 @@
 	}%
 	
 	\makeatother
+	\addcontentsline{toc}{chapter}{TABLE OF CONTENTS}
 	\tableofcontents
 	\pagebreak
 \endgroup
 
+\addcontentsline{toc}{chapter}{LIST OF FIGURES}
 \listoffigures
 \pagebreak
+\addcontentsline{toc}{chapter}{LIST OF TABLES}
 \listoftables
 \pagebreak
+\addcontentsline{toc}{chapter}{LIST OF FORMULAS}
 \listofformulas
+\pagebreak
+	\addcontentsline{toc}{chapter}{LIST OF ABBREVIATIONS}
+\listofabbreviations
 \pagebreak
