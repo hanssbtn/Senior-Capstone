@@ -14,6 +14,7 @@
 *.pyg
 Code/secret.env
 Code/dataset/
+Code/renders
 Code/models/qwen2.5/model.safetensors
 Code/model/roberta-base/model.safetensors
 !Code/dataset/annotated
