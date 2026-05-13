@@ -10,12 +10,13 @@
 % --- SUBSECTION 4.1.1 ---
 \subsection{Cross-Entropy Loss Analysis}
 	\begin{indentedblock}{4em}{0pt}
-		The training dynamics of the Dual-Stream tokenizer and the adapted Qwen 3.5B backbone were evaluated over 20 epochs using a curated, high-fidelity dataset of $N=2,500$ Boundary Representation (B-Rep) STEP files. As depicted in the training metrics, the Cross-Entropy Loss exhibited a rapid initial descent during the first 5 epochs, dropping from a randomized initialization baseline to below 1.0. This steep convergence indicates that the Rotary Positional Encodings (RoPE) successfully aligned the complex-valued geometric embeddings with the pre-trained semantic latent space of the large language model.
+		The training dynamics of the Dual-Stream tokenizer and the adapted Qwen 3.5 backbone were evaluated over 20 epochs using a curated, high-fidelity dataset of $N=2,500$ Boundary Representation (B-Rep) STEP files. As depicted in the training metrics, the Cross-Entropy Loss exhibited a rapid initial descent during the first 5 epochs, dropping from a randomized initialization baseline to below 1.0. This steep convergence indicates that the Rotary Positional Encodings (RoPE) successfully aligned the complex-valued geometric embeddings with the pre-trained semantic latent space of the large language model.
 		
 		\skiplines{1}
 		
 		Beyond Epoch 10, both the training and validation loss curves stabilized, converging synchronously toward approximately 0.5 by Epoch 20. Notably, the validation loss closely tracks the training loss without diverging upward, demonstrating an absence of overfitting. This stability empirically validates the implementation of the LIMA (Less Is More for Alignment) principle; by utilizing a smaller, strictly verified dataset devoid of topological noise, the model learned generalizable geometric rules rather than memorizing anomalous data artifacts. Furthermore, the absence of severe gradient spikes confirms that the zero-mean, unit-variance standardization applied to the continuous geometric vectors effectively regulated the inputs prior to the linear projection layer.
 	\end{indentedblock}
+	
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=1\linewidth, pagecenter]{"../Images/RESULTS.png"}
@@ -25,7 +26,9 @@
 % --- SUBSECTION 4.1.2 ---
 \subsection{Hardware Utility and Optimization}
 \begin{indentedblock}{4em}{0pt}
-	Training a 3.5 billion parameter model on dense topological graphs inherently introduces significant memory constraints. By utilizing 4-bit NormalFloat (NF4) Quantized LoRA (QLoRA) combined with FlashAttention-2, the computational overhead was drastically reduced. This optimization allowed for an expanded maximum sequence length, preventing the arbitrary truncation of complex mechanical assemblies and ensuring the model retained full global geometric context during the autoregressive generation phase.
+
+	Training a 3.5 billion parameter model on dense topological graphs inherently introduces significant memory constraints. By utilizing 4-bit NormalFloat (NF4) Quantized LoRA (QLoRA) combined with FlashAttention\-/2, the computational overhead was drastically reduced. This optimization allowed for an expanded maximum sequence length, preventing the arbitrary truncation of complex mechanical assemblies and ensuring the model retained full global geometric context during the autoregressive generation phase.
+	
 \end{indentedblock}
 
 % --- SECTION 4.2 ---

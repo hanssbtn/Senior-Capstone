@@ -51,52 +51,11 @@
 		\end{indentedblock}
 
 	\subsection{Dataset Preprocessing}
-		\subsubsection{Dataset Filtering}
-			\begin{indentedblock}{4em}{0pt}
-				Before training, the dataset undergoes a rigorous analysis to eliminate rare or low-quality CAD designs that could destabilize the model. The filtering process is divided into two distinct stages. The first stage is \textbf{Class and Format Standardization}, implemented using PythonOCC. The script scans the raw data to enforce domain relevance by discarding any files not listed in the target object whitelist (e.g., excluding rare CAD designs and broken/corrupted files). Valid JSON-based CAD files are then automatically converted to STEP format using the OpenCascade library, while other unrecognizable formats are purged from the dataset.
-				
-				\skiplines{1}
-				
-				The next stage focuses on \textbf{Manifold Validation}. Since raw STEP files frequently contain disjointed surfaces or unstitched faces, a "water-tight" topological check is enforced, Using volumetric analysis (Volume $> 0$), any file containing open shells or non-manifold geometry is explicitly discarded. This initial geometric sanitation prevents invalid outliers from polluting the training signal, ensuring that the model only learns from physically realizable 3D objects.
-				
-				\skiplines{1}
-	
-				The second stage addresses statistical robustness by identifying and pruning \textit{long-tail} categories, or more specifically, classes containing fewer than 100 unique geometric instances. This threshold is critical for preventing model overfitting. Deep learning models often resort to memorization rather than generalization when handling classes with insufficient sample sizes \parencite{deep_learning_goodfellow}. As demonstrated by \textcite{generalization_zhang}, neural networks possess the capacity to fit arbitrary noise; in the absence of large-scale data constraints, they tend to memorize specific training instances rather than extracting abstract rules. This phenomenon leads to \textit{shortcut learning}, where the model identifies objects via spurious noise patterns or texture statistics instead of meaningful topological features \parencites{shortcut_learning_geirhos}{memorization_arpit}. 
-				
-				\skiplines{1}
-				
-				Furthermore, recent studies indicate that this vulnerability is exacerbated in high-variability datasets. Research by \textcite{memorization_effect_you} demonstrates that machine learning models struggle significantly to identify low-occurrence classes where the "class pattern" breaks due to high intra-class variance. A minimum threshold of 100 instances is enforced during the filtering process, ensuring that every semantic category (e.g., \texttt{GEAR}, \texttt{BRACKET}) possesses sufficient geometric variance to force the Transformer to learn a generalized representation of the object type, rather than memorizing a handful of outliers.
-				
-				\skiplines{1}
-				
-				While modern deep learning often favors massive dataset scale, this research applies the \textbf{Less Is More for Alignment (LIMA)} principle \parencite{lima_zhou}. The LIMA framework posits that if a base model possesses sufficient generalized intelligence, domain adaptation requires data \textit{quality} and \textit{density} rather than sheer volume. 
-
-				\skiplines{1}
-								
-				Consequently, instead of brute-forcing the model with 100,000 noisy, unverified CAD files, the dataset is aggressively filtered down to a highly curated, ultra-high-fidelity subset of $N=2,500$ geometrically dense STEP files. Because each file is unrolled into a complex multi-node graph, these 2,500 files contain millions of distinct geometric relationships. By training exclusively on verified, high-quality data, the model converges on the complex mapping between Stream B mathematics and Stream A semantics without memorizing the spurious noise and hallucinated annotations prevalent in scraped datasets.
-				
-			\end{indentedblock}
-	
 		\subsubsection{Dataset Standardization and Annotation Format}
 			\begin{indentedblock}{4em}{0pt}
-				The next preprocessing step involves designing an annotation standard for the unannotated CAD dataset sources to ensure homogeneity with the pre-annotated Text2CAD dataset through a multi-stage standardization and formatting pipeline. The pipeline standardizes varied input structures into a consistent, unified representation matching the multi-level description schema of the Text2CAD dataset.
+				To standardize the model's output format, an annotation standard for the unannotated CAD dataset sources is used to ensure homogeneity with the pre-annotated Text2CAD dataset through a multi-stage standardization and formatting pipeline. The pipeline standardizes varied input structures into a consistent, unified representation similar to the multi-level description schema of the Text2CAD dataset. 
 				
-				\skiplines{1}
-				
-				Data sourced from TraceParts often contains descriptive but non-stand\\
-				-ardized filenames (e.g., \textit{"Hexagon\_Head\_Screw\_ISO4017\_M8.stp"}). To extract the functional class, a \textbf{Hierarchical Regex Parser} is employed. The parser utilizes a dictionary of domain-specific keywords to map CAD files into general, high-level categories to ensure accurate annotation. The mapping logic follows a precedence order specified below to resolve ambiguities:
-				
-				\skiplines{1}
-				
-				\begin{enumerate}
-					\item \textbf{Standard Extraction:} Strings containing ISO/DIN codes (e.g., "ISO 4017") are mapped immediately to their corresponding standard object family (e.g., \texttt{FASTENER}). This is done to exploit the rigorous standardization inherent in industrial engineering; parts explicitly labeled with international standards (ISO, DIN, ANSI) possess a verified, unambiguous functional identity, allowing them to serve as "Ground Truth" anchors for the classifier with near-100\% label confidence.
-					
-					\item \textbf{Morphological Keyword Search:} If no standard code is found, the parser scans for morphological roots. For example, filenames containing "gear", "pinion", or "worm" are all mapped to the class \texttt{GEAR} to simplify the manual annotation step.
-					
-					\item \textbf{Exclusion Logic:} To prevent misclassification of assemblies, filenames containing "Assy" or "Assembly" are flagged and excluded from the single-part classification dataset, as assembly CAD files s inherently represent composite systems containing multiple distinct components (e.g., a gearbox comprising shafts, bearings, and housings). Including these files would introduce label ambiguity, as a single input graph would correspond to multiple conflicting functional classes, which is outside the research's scope.
-				\end{enumerate}
-				
-				Finally, while the hierarchical schema structure is retained for compatibility, the semantic objective of the annotation fields is redefined. Instead of describing the steps required to generate the object, the multi-level schema is used to categorize annotations of the same object based on their level of detail. \autoref{tab:annotation-levels} below shows the defined annotation levels with an example for each level.
+				Additionally, while the hierarchical schema structure is retained for compatibility, the semantic objective of the annotation fields is redefined. Instead of describing the steps required to generate the object, the multi-level schema is used to categorize annotations of the same object based on their level of detail. \autoref{tab:annotation-levels} below shows the defined annotation levels with an example for each level.
 				
 				\begin{table}[H]
 					\centering
@@ -131,7 +90,7 @@
 						\textbf{Level 3 \newline (Detailed)} 
 						& \textbf{Parametric \newline Specification} 
 						& Provides precise constraints, dimensions, and standard designations required for reconstruction. 
-						& "An \textbf{ISO 4014 Hex Bolt} with a nominal thread diameter of \textbf{8mm} (M8), a total shaft length of \textbf{40mm}, and a thread pitch of 1.25mm." \\
+						& "An \textbf{ISO 4014 Hex Bolt} with a nominal thread diameter of \textbf{8mm} (M8), a total shaft length of \textbf{40mm}, and a thread pitch of 1.25mm, with a bounding box of 24 mm x 12 mm x 12 mm." \\
 						
 					\end{tblr}
 					\label{tab:annotation-levels}
@@ -139,22 +98,36 @@
 				
 			\end{indentedblock}
 		
+		\subsubsection{Dataset Filtering and Annotation}
+			\begin{indentedblock}{4em}{0pt}
+				The dataset is filtered before any training process to improve the model's output quality and validity. The filtering process is divided into two distinct stages. In the first stage, a Python script scans the STEP files and filters out files larger than 2.5 MB to limit compute requirements using PythonOCC. Next, an image of the object is taken from 7 different viewpoints (Front, Back, Top, Bottom, Left, Right, and Isometric), and any available metadata is taken and processed, removing general keywords such as "Component" or "Part". A VLM model (Qwen2.5-VL-7B) is then used with a defined system prompt to generate an annotation according to the format defined in the previous section. A small program is written to check the bounding boxes in the annotation. Lastly, the generated annotation then is assigned to a human reviewer for correctness and validity. 
+				
+				\skiplines{1}
+				
+				Due to the overwhelming variety of the dataset, most of the STEP files are removed as they are either too large to process with current computing resources and/or is malformed. While modern deep learning often favors massive dataset scale, this research applies the \textbf{Less Is More for Alignment (LIMA)} principle \parencite{lima_zhou}. The LIMA framework posits that if a base model possesses sufficient generalized intelligence, domain adaptation requires data \textit{quality} and \textit{density} rather than sheer volume. 
+
+				\skiplines{1}
+								
+				Consequently, instead of brute-forcing the model with 100,000 noisy, unverified CAD files, the dataset is aggressively filtered down to a highly curated, ultra-high-fidelity subset of $N=2,500$ geometrically dense STEP files. Because each file is unrolled into a complex multi-node graph, these 2,500 files contain millions of distinct geometric relationships. By training exclusively on verified, high-quality data, the model converges on the complex mapping between Stream B mathematics and Stream A semantics without memorizing the spurious noise and hallucinated annotations prevalent in scraped datasets.
+				
+			\end{indentedblock}
+	
 		\subsubsection{Annotation Validation using BERTScore and Inter-Rater Reliability}
 			\begin{indentedblock}{4em}{0pt}
 				Since the dataset is comprised of multiple sources, with most lacking the necessary descriptive texts, an additional annotation step is needed. Unlike simple classification, generating natural language descriptions requires high-fidelity textual data that automated processes cannot fully synthesize. To extend the dataset beyond the pre-annotated Text2CAD samples, a \textbf{Human-in-the-Loop (HITL)} annotation pipeline is employed. Unlike simple filtering, this process utilizes \textbf{BERTScore} \parencite{bertscore_zhang} as a semantic validation metric to guide the manual annotation process, ensuring that new descriptions align stylistically with the established Text2CAD annotation schema specified in \autoref{tab:annotation-levels}.
 			
 				\skiplines{1}
 			
-				The initial step includes writing manual annotations for each unannotated dataset entries which are validated by domain experts. The captions are designed to accurately describe the unlabelled geometric files (e.g., from TraceParts) with varying levels of detail. To maintain consistency, annotators follow a strict syntactic template derived from the Text2CAD dataset e.g. \textit{"[Functional Component] with [Geometric Features] and [Dimensions]."} This ensures that the training data remains uniform across different sources. 
+				The initial step includes writing manual annotations for each unannotated dataset entries which are validated by domain experts. The captions are designed to accurately describe the unlabelled geometric files (e.g., from TraceParts) with varying levels of detail. To maintain consistency, annotators follow a strict syntactic template derived from the Text2CAD dataset e.g. \textit{"[Functional Component] with [Geometric Features] and [Dimensions]."} to guarantee consistency between human annotators.  
 				
 				\skiplines{1}
 				
-				To validate the quality of the human-generated descriptions, a blind cross-verification study was conducted. A senior domain expert will be assigned to review a random sample of $N=100$ annotated descriptions, rating them as either "Compliant" or "Non-Compliant" based on the style guide. The consistency of this quality control process was measured using \textbf{Inter-Rater Reliability (IRR)}, specifically \textbf{'s Kappa ($\kappa$)} \parencite{kappa_cohen}. This metric was chosen over simple percent agreement to robustly account for the possibility of chance agreement, with a target threshold of $\kappa > 0.80$ established to certify the dataset's reliability for training the transformer model \parencite{kappa_landis}. Details of the equation can be seen in \autoref{sec:irr}.
+				Validation of the human-made annotation is done via a blind cross-verification procedure, where a senior domain expert will be assigned to review a random sample of annotated descriptions (e.g. 100 entries), and determines if the sampled annotations are accurate and well-formatted. The consistency of this quality control process was measured using \textbf{Inter-Rater Reliability (IRR)}, specifically \textbf{'s Kappa ($\kappa$)} \parencite{kappa_cohen}. This metric was chosen over simple percent agreement to robustly account for the possibility of chance agreement, with a target threshold of $\kappa > 0.80$ established to certify the dataset's reliability for training the transformer model \parencite{kappa_landis}. Details of the equation can be seen in \autoref{sec:irr}.
 			\end{indentedblock}
 			
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=1.2\linewidth, pagecenter]{"../Images/DATASET ACQUISITION AND FILTERING FLOWCHART"}
+		\includegraphics[width=\linewidth, pagecenter]{"../Images/DATASET ACQUISITION AND FILTERING FLOWCHART"}
 		\caption{Dataset acquisition and filtering flowchart}
 		\label{fig:dataset-acquisition-and-filtering-flowchart}
 	\end{figure}
@@ -166,15 +139,15 @@
 	% --- SUBSECTION 3.2.1 ---
 	\subsection{Tokenizer Architecture}
 		\begin{indentedblock}{4em}{0pt}
-			The tokenization pipeline consists of four distinct stages designed to ensure geometric invariance and computational efficiency. The overarching goal is to bridge the \textit{semantic gap} between the low-level mathematical definitions of CAD surfaces and the high-level semantic reasoning required by the Transformer. 
+			Tokenization is structured as four stages with different functionalities, such as ensuring geometric invariance and improving computation performance. Tokenization is done as a way to connect the gap between CAD surfaces defined using pure-mathematics and the semantic embedding of the Transformer. 
 			
 			\skiplines{1}
 			
-			Standard tokenizers face two primary limitations when parsing STEP files. First, they suffer from \textit{semantic fragmentation}, where high-precision floating-point coordinates are split into meaningless sub-word units (e.g., "10.125" becoming "10", ".", "12", "5"), destroying the numerical magnitude required for geometric reasoning \parencite{deepcad_wu}. Second, standard sequential processing fails to capture the \textit{non-local graph topology} inherent in B-Rep data. Spatially adjacent geometric features are often linked only by arbitrary reference IDs (e.g., \#243), creating long-range dependencies that exhaust the finite context window of standard models \parencite{deepcad_wu}. 
+			Current tokenizers have major limitations when handling STEP files. First, they suffer from \textit{semantic fragmentation}, where high-precision floating-point coordinates are split into meaningless sub-word units (e.g., "10.125" becoming "10", ".", "12", "5"), destroying the numerical magnitude required for geometric reasoning \parencite{deepcad_wu}. Another issue deals with preserving the non-local B-Rep graph topology. Adjacent parts of the CAD object might have a long-range dependency which might not fit in the model's context window \parencite{deepcad_wu}. Lastly, most tokenizers used by current LLMs cannot handle STEP files as-is due to the format being unrecognized, forcing the tokenizer to parse the file as single characters leading to increased token use.
 			
 			\skiplines{1}
 			
-			The proposed architecture addresses these limitations by integrating \textbf{Complex-Valued Embeddings} \parencite{trabelsi_2017_deep} and \textbf{Rotary Positional Encodings} \parencite{su_2023_roformer}. This allows the model to inherently encode geometric rotation and magnitude within the latent space, preserving topological fidelity without relying on reconstruction history. \autoref{fig:tokenizer-pipeline} illustrates the architecture.
+			To handle these issues, a special tokenizer is designed to integrate Complex-Valued Embeddings \parencite{trabelsi_2017_deep} and Rotary Positional Encodings \parencite{su_2023_roformer} into the tokenizer's output. The addition of these encodings allow the tokenizer to encode geometric rotation and magnitude within the tokens, helping the model better understand the shape and geometry (position, rotation, and translation) of the model. The tokenizer design can be seen in \autoref{fig:tokenizer-pipeline}.
 			
 			\begin{figure}[H]
 				\includegraphics[width=1.2\linewidth, pagecenter]{../Images/TikZ/TOKENIZER.pdf}%
@@ -186,7 +159,7 @@
 	
 		\subsubsection{Stage 1: Canonical Geometric Normalization}
 			\begin{indentedblock}{4em}{0pt}
-				Standard STEP coordinates are sensitive to global positioning; a mechanical component defined at $(0,0,0)$ generates a different token sequence than the same component translated to $(100,100,100)$. A robust model must achieve translational and rotational invariance, ensuring that the output is independent of the input's spatial frame of reference \parencites{medical_imaging_li}{rotational_invariance_muaz}. To achieve this, the B-Rep graph undergoes a rigorous \textbf{Canonical Alignment} process. This reduces the dimensionality of the learning manifold by ensuring that all semantically identical objects occupy the same region in the vector space \parencite{deepcad_wu}. The pipeline implements three transformations:
+				B-Rep coordinates are defined relative to a global origin. This means a part defined at coordinate $(0,0,0)$ may generate a different token sequence than the same component translated to another coordinate. As such, the tokens generated by the tokenizer needs to stay consistent and not vary with translation, rotation, and/or change of reference frame \parencites{medical_imaging_li}{rotational_invariance_muaz}. The STEP files processed by the tokenizer is applied with a fixed set of linear transformations as a way to ensure the objects are aligned consistently \parencite{deepcad_wu}. The pipeline implements three transformations:
 				
 				\begin{enumerate}
 					\item \textbf{Centroid Subtraction (Translation Invariance):} The geometric center of mass $\mu$ is computed across the set of control points $P$. All vertices are translated such that the centroid aligns with the global origin:
@@ -205,13 +178,13 @@
 					
 					The eigenvectors $v_1, v_2, v_3$ of $\Sigma$ represent the primary, secondary, and tertiary axes of variance. The geometry is rotated via matrix $R = [v_1, v_2, v_3]$ such that the axis of greatest variance (e.g., the length of a screw) aligns with the global $z$-axis.
 					
-					\item \textbf{Ambiguity Resolution:} Standard PCA suffers from sign ambiguity (the "180-degree flip" problem). To resolve this, a deterministic "heavy-bottom" rule is enforced: if the density of points in the negative $z$ half-space is lower than in the positive half-space, the axis is flipped ($z' = -z$). This ensures consistent orientation across the dataset \parencite{3d_model_retrieval_vranic}.
+					\item \textbf{Ambiguity Resolution:} Standard PCA suffers from sign ambiguity (the "180-degree flip" problem). The tokenizer solves this by setting the orientation based on the model's density. Given a coordinate space $(x, y, z)$ where $z$ is the vertical axis, if the negative-half $(z < 0)$ has a larger density of points, the positive-half $(z > 0)$ and the negative-half is switched ($z' = -z$) to make orientation consistent within the STEP files \parencite{3d_model_retrieval_vranic}.
 				\end{enumerate}
 			\end{indentedblock}
 			
 		\subsubsection{Stage 2: Geometric Data Extraction}
 			\begin{indentedblock}{4em}{0pt}
-				To preserve high-fidelity precision (e.g., NURBS weights) without bloating the discrete vocabulary, a Dual-Stream architecture is used. The tokenizer emits two parallel streams for every step $t$:
+				The model requires lossless encoding of mathematical structures within the B-Rep graph such as coordinates and NURBS weights. The tokenizer outputs two set of vectors streams for every step $t$ utilizing a Dual-Stream architecture:
 				\begin{itemize}
 					\item \textbf{Stream A (Semantic Tokens):} Discrete integers representing the categorical type of entity/macro token (e.g., \texttt{<PLANE>}, \texttt{<CIRCLE>}, \texttt{<FILLET\_CHAIN>}).
 					\item \textbf{Stream B (Geometric Embeddings):} A 128-dimensional \textbf{Complex-Valued Vector} encoding the shape parameters.
@@ -283,12 +256,13 @@
 					\begin{indentedblock}{2em}{0pt}
 						Although collapsing subgraphs into macro tokens may significantly shorten the token sequence length, there are strict mathematical and computational constraints that prohibit the creation of an overly expansive macro dictionary (e.g., defining tokens for highly specific shapes like \texttt{<HEXAGONAL\_POCKET\_WITH\_CHAMFER>}). The reasons for limiting the macro tokens are threefold:
 						
+						\begin{sloppypar}
 						\begin{enumerate}
 							\item \textbf{Vocabulary Sparsity and Embedding Quality:} The transformer relies on statistical frequency to learn high-quality embeddings. If highly specific macros are defined, their occurrence across the dataset will be extremely rare (forming a long-tail distribution). This means that with the model lacks sufficient training samples to adequately adjust the vector weights for these rare tokens, leading to poor generalization.
 							\item \textbf{Loss of Compositional Flexibility:} Transformers inherently excel at compositional reasoning, which involves combining simple, foundational tokens to understand complex, novel objects. Over-compressing the graph into strict, pre-defined shapes removes the model's ability to interpret unique geometric variations that do not perfectly align with a programmed template.
 							\item \textbf{Computational Overhead of Subgraph Isomorphism:} The compression stage relies on Graph Isomorphism matching, which is historically an NP-complete problem. As the complexity of the templates and the size of the dictionary increase, the time required to parse and compress the raw B-Rep graphs scales exponentially. Limiting the macros to fundamental, highly frequent features guarantees that the data preprocessing remains computationally tractable.
 						\end{enumerate}
-						
+						\end{sloppypar}
 						The execution order of the macro-compression pipeline is strictly prioritized in descending order of topological complexity. The graph is scanned for composite manufacturing features (e.g., holes, chamfers, fillets) prior to isolated primitives (e.g., spheres, standalone cylinders), and concludes with foundational base features (e.g., planar surfaces). This hierarchical, greedy-matching strategy is necessary to prevent destructive interference during token compression. For instance, compressing primitive cylinders before holes will result in the internal cylindrical face of a drilled hole being prematurely collapsed into an isolated \texttt{<CYLINDER\_PRIMITIVE>}. Consequently, the broader \texttt{<THROUGH\_HOLE>} subgraph template would fail to match, incorrectly leaving the associated bounding circular edges and planar surfaces stranded in the sequence. 
 					\end{indentedblock}
 			\end{indentedblock}
@@ -304,17 +278,12 @@
 				\begin{equation}
 					\text{Order}(C) = \text{sort}_{\downarrow}\left( \{ \mathbf{f}(c) \mid c \in C \} \right)
 				\end{equation}
-			
-				The invariant function $\mathbf{f}(c)$ utilizes a \textbf{Hierarchical Sorting Key}:
-				\begin{itemize}
-					\item \textbf{Primary Key ($k_1$):} \textit{Geometric Magnitude}. \textbf{Surface Area} for faces; \textbf{Curve Length} for edges. This ensures dominant features appear early, providing a stable context for attention.
-					\item \textbf{Secondary Key ($k_2$):} \textit{Centroid Distance}. Euclidean distance from the entity's centroid to the origin $(0,0,0)$.
-					\item \textbf{Tertiary Key ($k_3$):} \textit{Topological Degree}. The number of connected edges/loops.
-				\end{itemize}
+				
+				Where $Order(C)$ is the order of the child nodes. $\mathbf{f}(c)$ is defined as a function that outputs a strict ordering with a set precendence. The objects are ordered the object's geometric magnitude (surface area for faces and curve length for edges), then its distance to the origin, and their degree (number of connected edges/loops), according to the specified precendence. 
 				
 				\paragraph{Handling Symmetries}
 				\begin{indentedblock}{2em}{0pt}
-					In cases of perfect symmetry (e.g., a Cube where all faces have identical Area and Distance), a deterministic fallback utilizes the principal axis alignment from Stage 2: faces are sorted by their centroid's $Z, Y, X$ coordinates. This guarantees that a specific 3D geometry yields an identical token sequence regardless of the raw file's ID permutation \parencite{colligan_2022_hierarchical}.
+					A fallback function which utilizes the axis alignment in Step 2 is used as a tie-breaking mechanism, where the faces' spatial coordinates $(Z, Y, \text{ and } X \text{ in that order})$ is used as sorting keys. This guarantees that a specific 3D geometry yields an identical token sequence regardless of the raw file's ID permutation \parencite{colligan_2022_hierarchical}.
 				\end{indentedblock}
 			\end{indentedblock}
 	
@@ -399,43 +368,40 @@
 		
 		\subsubsection{Parameter-Efficient Dual-Stream Fine-Tuning}
 			\begin{indentedblock}{4em}{0pt}
-				The training phase leverages a Parameter-Efficient Fine-Tuning (PEFT) strategy to adapt the base Large Language Model to the specialized task of B-Rep annotation without requiring full-parameter updates. The custom architecture, denoted as \mintinline{python}{GeometricSemanticModel}, 
-				effectively fuses the discrete text tokens and the continuous geometric data.
+				In order to efficiently fine-tune the model, the training process needs to consider the available hardware and other resources such as training time.
+				
+				To reduce the time needed for fine-tuning, the process utilizes Parameter-Efficient Fine-Tuning (PEFT) to fine-tune the LLM for B-Rep annotation without requiring complete retraining from the ground up. The model architecture fuses the discrete text tokens and the continuous geometric data to generate an accurate representation of the CAD object. This is done by projecting the 128-dimensional vectors generated from the graph using Low-Rank Adaptation (LoRA) layer(s) represented as matrices $W_p$ embedded into the base model and training it to process special tokens created from the B-Rep graph, allowing the model to preserve its prior knowledge.  
 				
 				\skiplines{1}
 				
-				Bridging the modality gap involves projecting the 128-dimensional geometric vector extracted from the topological graph (Stream B) into the $n$-dimensional semantic embedding space of the base model. This is achieved via a trainable linear projection layer ($W_p$), allowing the transformer to process geometric parameters natively alongside text token embeddings.
+				The AdamW optimizer is used to handle weight updates as it offers the required versatility for optimum training time. However, the optimizer suffers from gradient spikes due to the second vector stream during the training procedure, requiring an additional gradient clipping step to normalize the values. The process is done by first unscaling the gradients, followed by clipping them at a maximum norm of 1.0 before the optimizer steps.
 				
 				\skiplines{1}
 				
-				The model is optimized using the AdamW optimizer, selected for its efficient handling of weight decay and moving averages of past gradients (momentum). However, because the Dual-Stream inputs introduce complex-valued math vectors, the training loop is highly susceptible to gradient spikes. To guarantee numerical stability and prevent infinite or NaN (Not a Number) loss values, \textbf{Gradient Clipping} is enforced, unscaling the gradients and clipping them at a maximum norm of 1.0 before the optimizer steps.
-				
-				\skiplines{1}
-				
-				Furthermore, to maximize hardware utility and reduce VRAM constraints, the training pipeline implements \textbf{Mixed Precision Training} via PyTorch's \texttt{GradScaler}. Memory efficiency is further enhanced by \textbf{Gradient Accumulation}, which simulates larger batch sizes by accumulating gradients over multiple forward passes before executing a singular optimizer step and updating the model weights. Low-Rank Adaptation (LoRA) is utilized to freeze the majority of the pre-trained weights, updating only a low-rank decomposition of the attention matrices. This preserves the base model's linguistic capabilities while rapidly learning the spatial mappings of the CAD domain.
+				Compute resource constraints are managed by implementing Mixed Precision Training using \texttt{GradScaler} from PyTorch to allow for lower precision values to be used, reducing training time and memory usage. Gradients from a fixed size of batches are accumulated to limit the amount of weight updates required. 
 			\end{indentedblock}
 	
 	\subsection{Evaluation Metrics}
 		\subsubsection{Metric Definition and Evaluation Thresholds}
 			\begin{indentedblock}{4em}{0pt}
-				Since the output is an open-ended natural language sequence, standard accuracy metrics are insufficient. This study employs a suite of semantic similarity metrics to evaluate the generated annotations' quality against the ground truth using the following metrics.
+				Due to the output format being human-readable text, the default metrics such as model accuracy and precision cannot be used. To properly gauge the model's output quality, the following set of metrics are used as a replacement:
 			
 				\paragraph{BLEU-4 \parencite{bleu_papineni}}
 					\begin{indentedblock}{2em}{0pt}
-						The metric enforces terminological and geometric precision, ensuring the model correctly predicts specific technical codes (e.g., "ISO 4014") where exact matching is required. It quantifies 4-gram precision with uniform weights and a brevity penalty:
+						BLEU-4 measures one-to-one correspondence of one text to another, as defined by the following equation:
 						
 						\begin{equation}
 							\text{BLEU} = BP \cdot \exp\left( \sum_{n=1}^{4} w_n \log p_n \right)
 						\end{equation}
 						
-						where $BP$ is the brevity penalty, which penalizes generated descriptions that are too short compared to the reference text, $w_n$ represents the uniform weights assigned to each $n$-gram level (specifically $w_n = 0.25$ for $n=1, 2, 3, 4$), and $p_n$ is the modified $n$-gram precision, representing the ratio of generated $n$-grams that exactly match the ground truth.
+						where $BP$ is the penalty given for descriptions that doesn't match the reference. The weights $w_n$ are uniform values (0.25) that weights the precision of the text fragment's precision $p_n$ which represents the number of exact matches.
 					\end{indentedblock}
 				\paragraph{ROUGE-L \parencite{lin_rouge}}
 					\begin{indentedblock}{4em}{0pt}
-						This metric rewards the correct syntactic flow of the engineering description, ensuring the model generates complete sentence structures rather than disjointed keywords. It measures the Longest Common Subsequence (LCS) to evaluate the output's recall and structure $R_\text{lcs}$:
+						ROUGE-L measures the coherence of the structure of a given piece of text using the longest common subsequence. The score $\text{ROUGE}_\text{LCS}$ is calculated using the following equation:
 						
 						\begin{equation}
-							R_\text{lcs} = \frac{LCS(X, Y)}{m}
+							\text{ROUGE}_\text{LCS} = \frac{LCS(X, Y)}{m}
 						\end{equation}
 						
 						where $LCS(X, Y)$ is the length of the longest matching sequence of words between the generated candidate $Y$ and the reference truth $X$, preserving word order but allowing for gaps and $m$ is the total length (number of words) of the reference description $X$.
@@ -456,32 +422,35 @@
 						where $x$ and $\hat{x}$ are the reference sequence (ground truth) and the candidate sequence (model output), $|x|$ and $|\hat{x}|$ represent the total number of tokens in the reference and candidate sequences. $\mathbf{x}_i$ and $\hat{\mathbf{x}}_j$ are the normalized, contextualized embedding vectors for the $i$-th token in the reference and the $j$-th token in the candidate sequences. $\mathbf{x}_i^\top \hat{\mathbf{x}}_j$ computes the cosine similarity (dot product) between the two embedding vectors. Lastly, the $\max$ denotes the greedy matching process, which pairs each token in one sentence to the single most semantically similar token in the other sentence.
 					\end{indentedblock}				
 				\paragraph{Human Verification (IRR)}
-				
+					
 					\begin{indentedblock}{4em}{0pt}
 						\label{sec:irr}
 						The metric involves a manual review process where human experts verify a subset of generations against the 3D geometry. It explicitly identifies hallucinations in the model's output which are not present in the ground truth annotations and serves as the final quality check for the model.
 						
-						A manual review protocol is utilized to prevent physical hallucinations, namely instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent from the B-Rep data. Due to the high cognitive load required to mentally reconstruct and verify complex B-Rep topology against text, the evaluation utilizes a \textbf{Stratified Random Sample} generation-geometry pairs. In specialized domains requiring expert-level annotation, massive sample sizes (e.g., $N > 500$) frequently introduce annotator fatigue, degrading the reliability of the ground truth \parencite{deep_learning_goodfellow}. A meticulously reviewed, stratified sample of $N=100$ ensures high-fidelity human validation while proportionally covering the major macro-classes (e.g., fasteners, gears, brackets) present in the dataset. The reliability of the generated descriptions against human expert judgment is quantified using Cohen's Kappa ($\kappa$) which denotes the robust agreement score ranging from $-1$ to $1$. A $\kappa$ score $> 0.80$ indicates substantial reliability of the expert's verification:
+						\begin{sloppypar}
+							A manual review protocol is utilized to prevent physical hallucinations, namely instances where the model generates plausible-sounding features (e.g., "threaded") that are physically absent from the B-Rep data. Due to the high cognitive load required to mentally reconstruct and verify complex B-Rep topology against text, the evaluation utilizes a \textbf{Stratified Random Sample} generation-geometry pairs. In specialized domains requiring expert-level annotation, massive sample sizes (e.g., $N > 500$) frequently introduce annotator fatigue, degrading the reliability of the ground truth \parencite{deep_learning_goodfellow}. A meticulously reviewed, stratified sample of $N=100$ ensures high-fidelity human validation while proportionally covering the major macro-classes (e.g., fasteners, gears, brackets) present in the dataset. The reliability of the generated descriptions against human expert judgment is quantified using Cohen's Kappa ($\kappa$) which denotes the robust agreement score ranging from $-1$ to $1$. A $\kappa$ score $> 0.80$ indicates substantial reliability of the expert's verification:
+							\begin{equation}
+								\kappa = \frac{p_o - p_e}{1 - p_e}
+							\end{equation}
+							
+							where $p_o$ is the relative observed agreement (the proportion of times the model's generated facts exactly match the human's binary assessment of the geometry), and $p_e$ is the hypothetical probability of chance agreement, calculated using the marginal probabilities of each rater's (or model's) classification frequencies. Each of these probabilities is mathematically derived from the evaluation confusion matrix as follows:
+							
+							\begin{equation}
+								p_o = \frac{1}{N} \sum_{i=1}^{C} n_{ii}
+							\end{equation}
+							
+							\begin{equation}
+								p_e = \frac{1}{N^2} \sum_{i=1}^{C} n_{i+} n_{+i}
+							\end{equation}
+							
+							where $N$ is the total number of sampled generation-geometry pairs evaluated during the manual review, $C$ is the number of discrete classification categories (for a binary hallucination check, $C = 2$, representing "Pass" and "Fail"), $n_{ii}$ represents the number of instances where both the model's output and the human rater agreed on category $i$ (the main diagonal of the confusion matrix). $n_{i+}$ is the marginal total of instances where the model's output corresponded to category $i$, and $n_{+i}$ is the marginal total of instances that the human expert explicitly classified as category $i$.
+								
+						\end{sloppypar}
 						
-						\begin{equation}
-							\kappa = \frac{p_o - p_e}{1 - p_e}
-						\end{equation}
-						
-						where $p_o$ is the relative observed agreement (the proportion of times the model's generated facts exactly match the human's binary assessment of the geometry), and $p_e$ is the hypothetical probability of chance agreement, calculated using the marginal probabilities of each rater's (or model's) classification frequencies. Each of these probabilities is mathematically derived from the evaluation confusion matrix as follows:
-						
-						\begin{equation}
-							p_o = \frac{1}{N} \sum_{i=1}^{C} n_{ii}
-						\end{equation}
-						
-						\begin{equation}
-							p_e = \frac{1}{N^2} \sum_{i=1}^{C} n_{i+} n_{+i}
-						\end{equation}
-						
-						where $N$ is the total number of sampled generation-geometry pairs evaluated during the manual review, $C$ is the number of discrete classification categories (for a binary hallucination check, $C = 2$, representing "Pass" and "Fail"), $n_{ii}$ represents the number of instances where both the model's output and the human rater agreed on category $i$ (the main diagonal of the confusion matrix). $n_{i+}$ is the marginal total of instances where the model's output corresponded to category $i$, and $n_{+i}$ is the marginal total of instances that the human expert explicitly classified as category $i$.
-						
-					\end{indentedblock}				
-				For each of the quantitative metrics listed, a minimum threshold is determined as a way to measure the quality of the model's results. For instance, the model ideally results in a BLEU-4 score $> 0.4$ to closely match Human-to-Human results \parencite{wu_google_translate}. The minimum threshold for ROUGE-L is set to be $> 0.35$ to ensure the model does not omit necessary details of the model from the annotation \parencite{lin_rouge}. Lastly, an ideal BERTScore threshold of $> 0.85$ is chosen since it measures the similarity in meaning between 2 sentences \parencite{bertscore_zhang}. A brief summary of each evaluation metric can be seen in \autoref{tab:evaluation-metrics}.
-				
+					\end{indentedblock}		
+							
+					For each of the quantitative metrics listed, a minimum threshold is determined as a way to measure the quality of the model's results. For instance, the model ideally results in a BLEU-4 score $> 0.4$ to closely match Human-to-Human results \parencite{wu_google_translate}. The minimum threshold for ROUGE-L is set to be $> 0.35$ to ensure the model does not omit necessary details of the model from the annotation \parencite{lin_rouge}. Lastly, an ideal BERTScore threshold of $> 0.85$ is chosen since it measures the similarity in meaning between 2 sentences \parencite{bertscore_zhang}. A brief summary of each evaluation metric can be seen in \autoref{tab:evaluation-metrics}.
+					
 				\begin{table}[H]
 					\centering
 					\caption{Summary of Evaluation Metrics for Geometric Captioning}
@@ -529,28 +498,22 @@
 			\begin{indentedblock}{4em}{0pt}
 				To ensure the model is both mathematically accurate and computationally viable for real-world engineering applications, the evaluation protocol extends beyond standard semantic benchmarks. The following secondary metrics are calculated during the testing phase:
 				
-				\begin{enumerate}
-					\item \textbf{Topological Compression Ratio:} To quantify the efficiency of Stage 3 (Semantic Macro-Compression), the average percentage reduction in sequence length (total nodes and edges) is calculated between the raw B-Rep graphs and the compressed macros. This verifies the tokenizer's ability to maximize the transformer's effective receptive field.
-					
-					\item \textbf{Attention Ablation Study:} To mathematically isolate the performance gains provided by the custom Dual-Stream architecture, an ablation study is conducted. The model's baseline BLEU and BERTScore are evaluated \textit{without} the injection of the geometric vectors (Stream B) and Rotary Positional Encodings (RoPE), and then compared against the full architecture.
-					
-					\item \textbf{Inference Efficiency and Hardware Utility:} Practical deployment requires reasonable latency. The evaluation tracks \textbf{Tokens per Second (TPS)}, \textbf{Peak VRAM Usage}, and \textbf{Average Generation Latency} (in seconds) required to generate a complete L1-L3 hierarchical annotation for a complex assembly.
-				\end{enumerate}
+				\begin{sloppypar}
+					\begin{enumerate}
+						\item \textbf{Topological Compression Ratio:} To quantify the efficiency of Stage 3 (Semantic Macro-Compression), the average percentage reduction in sequence length (total nodes and edges) is calculated between the raw B-Rep graphs and the compressed macros. This verifies the tokenizer's ability to maximize the transformer's effective receptive field.
+						
+						\item \textbf{Attention Ablation Study:} To mathematically isolate the performance gains provided by the custom Dual-Stream architecture, an ablation study is conducted. The model's baseline BLEU and BERTScore are evaluated \textit{without} the injection of the geometric vectors (Stream B) and Rotary Positional Encodings (RoPE), and then compared against the full architecture.
+						
+						\item \textbf{Inference Efficiency and Hardware Utility:} Practical deployment requires reasonable latency. The evaluation tracks \textbf{Tokens per Second (TPS)}, \textbf{Peak VRAM Usage}, and \textbf{Average Generation Latency} (in seconds) required to generate a complete L1-L3 hierarchical annotation for a complex assembly.
+					\end{enumerate}
+				\end{sloppypar}
 				
 			\end{indentedblock}
 		\subsubsection{BLEU vs BERTScore}
 			\begin{indentedblock}{4em}{0pt}
-				It is recognized in Natural Language Generation (NLG) literature that semantic metrics (BERTScore) and $n$-gram metrics (BLEU) can exhibit an inverse correlation; increasing the "creativity" of a model often improves semantic flow at the cost of exact word matching. Resolving this tension and ensure robust evaluation requires an implementation of a \textbf{Hierarchical Metric Prioritization} strategy that aligns specific metrics with the annotation levels defined in \autoref{tab:annotation-levels} as defined below:
+				It is recognized in Natural Language Generation (NLG) literature that semantic metrics (BERTScore) and $n$-gram metrics (BLEU) can exhibit an inverse correlation; increasing the "creativity" of a model often improves semantic flow at the cost of exact word matching. Ensuring proper evaluation requires the metrics to have a defined priority that aligns them with the annotation levels defined in \autoref{tab:annotation-levels}. For instance, both \texttt{L1} and \texttt{L2} prioritizes BERTScore as an exact matching description is not required to describe what the object is and its function(s). In contrast, \texttt{L3} annotation whcih deals with strict specifications and mathematical uses BLEU-4 and ROUGE-L as the main metrics as correctness is valued above expressive descriptions.
 				
-				\begin{itemize}
-					\item \textbf{Level 1 (Functional Category): Prioritizing BERTScore.} \\
-					At the abstract level, synonymy is acceptable (e.g., "Fastener" $\approx$ "Fixing"). Therefore, a high BERTScore with a lower BLEU score is considered a success, as it indicates the model correctly identified the semantic class even if the phrasing differs from the ground truth.
-					
-					\item \textbf{Level 3 (Parametric Specification): Prioritizing BLEU/ROUGE.} \\
-					At the detailed level, synonymy is strictly forbidden for engineering constraints (e.g., "M8" $\neq$ "M6"). Here, the evaluation logic inverts: a high BLEU score is mandatory. If a generation achieves high BERTScore but low BLEU at this level, it is flagged as a \textbf{"Hallucination Failure"}, indicating the model generated a plausible-sounding but factually incorrect specification.
-				\end{itemize}
-				
-				By treating the metrics as complementary filters rather than competing objectives, the model can distinguish between \textit{benign stylistic variations} (penalized by BLEU but accepted by BERTScore) and \textit{critical engineering errors} (penalized by both). Because the model generates all three hierarchical levels autoregressively as a single continuous string during inference, a programmatic parsing step is introduced during evaluation. By using the indivisible \texttt{[L1]}, \texttt{[L2]}, and \texttt{[L3]} macro tokens as string delimiters, the evaluation script slices the generated output into its constituent tiers. This allows the framework to dynamically apply BERTScore strictly to the extracted abstract text (Level 1) and BLEU strictly to the extracted parametric data (Level 3), achieving granular evaluation of a single generated sequence.
+				Separating the metrics used in each level allows the model to learn how to generate factual yet expressive annotations. As the model outputs all three annotation formats during inference, the model is trained to output markers which denote the annotation's position within the text which are then evaluated separately.
 			\end{indentedblock}
 		
 \endgroup

@@ -1,0 +1,26 @@
+\renewcommand{\thechapter}{\Roman{chapter}}
+\chapter[]{CONCLUSION}
+\renewcommand{\thechapter}{\arabic{chapter}}
+\begingroup
+\fontsize{12pt}{\baselineskip}\selectfont
+
+\section{Summary of Findings}
+
+\subsection{Effectiveness of the Hierarchical Dual-Stream Tokenizer}
+\begin{indentedblock}{4em}{0pt}
+	
+	Analysis of the developed architecture shows the viability of utilizing a transformer for automatic annotation generation. Using a specialized Dual-Stream tokenizer allows for the model to accurately map the tokenized representation of CAD objects into factual descriptions with varying levels of detail. Token compression and mathematical value embeddings reduced the inference time required by the model and improved output quality.
+	
+\end{indentedblock}
+
+\section{Significance and Contributions}
+\begin{indentedblock}{4em}{0pt}
+	Applying the LIMA principle proved that data quality and density are superior to sheer volume for specialized CAD domain adaptation as the small dataset is able to accurately annotate the files reserved for testing. The approach eliminated spurious noise and "shortcut learning" common in models trained on unverified web-scraped data. The resulting framework revolutionizes industrial CAD management by enabling automated, high-fidelity indexing and retrieval, significantly reducing the manual overhead previously required for design documentation.
+\end{indentedblock}
+
+\section{Limitations and Future Research}
+\begin{indentedblock}{4em}{0pt}
+	Despite high quantitative performance and a significant agreement in human verification quantified using Cohen's Kappa, certain limitations remain. For example, the model is currently constrained to the English language and focuses on common reusable assets due to the scarcity of complex, publicly available industrial assemblies. Furthermore, the current model is limited to only generating technical, descriptive annotations in English. Future studies could expand the vocabulary to include multi-lingual annotations and explore zero-shot adaptation for even more specialized engineering domains. Additionally, further research into reducing the computational cost of Graph Isomorphism matching during the macro-compression stage would improve pipeline scalability for large-scale enterprise repositories.
+\end{indentedblock}
+
+\endgroup

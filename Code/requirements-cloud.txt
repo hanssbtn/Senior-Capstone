@@ -1,0 +1,16 @@
+# --- Google Colab Versions ---
+# Prevents pip from breaking the Jupyter UI
+ipython==7.34.0
+ipykernel==6.17.1
+tornado==6.5.1
+google-auth==2.47.0
+cryptography<44
+websockets<16.0
+fsspec==2025.3.0
+docutils<0.22
+
+pandas>=1.5.3,<3.0.0
+numpy<2.1
+pillow<12.0
+matplotlib
+scikit-learn
