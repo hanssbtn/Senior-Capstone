@@ -13,9 +13,11 @@
 *.minted
 *.pyg
 Code/secret.env
-Code/dataset/
+Code/*dataset*/
 Code/renders
-Code/models/qwen2.5/model.safetensors
-Code/model/roberta-base/model.safetensors
-!Code/dataset/annotated
+Code/models/qwen3.5/
+Code/models/qwen2.5-VL-7B/
+Code/model/roberta-base/
+Code/*tar.gz
+!Code/compressed_dataset.tar.gz
 

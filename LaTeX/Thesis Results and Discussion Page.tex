@@ -10,7 +10,7 @@
 % --- SUBSECTION 4.1.1 ---
 \subsection{Cross-Entropy Loss Analysis}
 	\begin{indentedblock}{4em}{0pt}
-		The training dynamics of the Dual-Stream tokenizer and the adapted Qwen 3.5 backbone were evaluated over 20 epochs using a curated, high-fidelity dataset of $N=2,500$ Boundary Representation (B-Rep) STEP files. As depicted in the training metrics, the Cross-Entropy Loss exhibited a rapid initial descent during the first 5 epochs, dropping from a randomized initialization baseline to below 1.0. This steep convergence indicates that the Rotary Positional Encodings (RoPE) successfully aligned the complex-valued geometric embeddings with the pre-trained semantic latent space of the large language model.
+		The training dynamics of the Dual-Stream tokenizer and the adapted Qwen 3.5 backbone were evaluated over 20 epochs using a curated, high-fidelity dataset of $N=1000$ Boundary Representation (B-Rep) STEP files. As depicted in the training metrics, the Cross-Entropy Loss exhibited a rapid initial descent during the first 5 epochs, dropping from a randomized initialization baseline to below 1.0. This steep convergence indicates that the Rotary Positional Encodings (RoPE) successfully aligned the complex-valued geometric embeddings with the pre-trained semantic latent space of the large language model.
 		
 		\skiplines{1}
 		
